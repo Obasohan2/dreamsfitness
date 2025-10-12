@@ -52,7 +52,7 @@
 
         <!-- Search bar -->
         <div class="col-12 col-lg-4 my-auto py-1 py-lg-0">
-            <form method="GET" action="{% url 'product_search' %}"> {# Replace with your actual search view #}
+            <form method="GET" action="#"> {# Replace with your actual search view #}
                 <div class="input-group w-100">
                     <input class="form-control border border-black rounded-0" type="text" name="q" placeholder="Search our site">
                     <div class="input-group-append">
@@ -78,9 +78,9 @@
                     <div class="dropdown-menu border-0" aria-labelledby="user-options">
                         {% if request.user.is_authenticated %}
                             {% if request.user.is_superuser %}
-                                <a href="{% url 'profile_me' %}" class="dropdown-item">My Profile</a>
+                                <a href="#" class="dropdown-item">My Profile</a>
                             {% endif %}
-                            <a href="{% url 'enroll' %}" class="dropdown-item">Enroll</a> {# Replace with enroll view #}
+                            <a href="#" class="dropdown-item">Enroll</a> {# Replace with enroll view #}
                             <a href="{% url 'account_logout' %}" class="dropdown-item">Logout</a>
                         {% else %}
                             <a href="{% url 'account_signup' %}" class="dropdown-item">Register</a>
@@ -92,7 +92,7 @@
                 <!-- Shopping cart -->
                 <li class="list-inline-item">
                     <a class="{% if grand_total %}text-info font-weight-bold{% else %}text-black{% endif %} nav-link"
-                       href="{% url 'cart_view' %}">
+                       href="#">
                         <div class="text-center">
                             <div><i class="fas fa-shopping-bag fa-lg"></i></div>
                             <p class="my-0">
@@ -124,7 +124,7 @@
     <!-- Banner -->
     <div id="delivery-banner" class="row text-center">
         <div class="col bg-black text-white">
-            <h5 class="logo-font my-1">GET £0 JOINING FEE - Hurry, Ends Monday! Excludes Selected Gyms</h5>
+            <h5 class="logo-font my-1">GET £0 JOINING FEE - Hurry, Ends Monday! Excludes Selected Workouts</h5>
         </div>
     </div>
 </header>

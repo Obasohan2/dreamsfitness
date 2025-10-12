@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'allauth.account',  # django-allauth account
     'allauth.socialaccount',  # django-allauth social account
     'home',  # our home app
+    'products',  # products app
 ]
 
 MIDDLEWARE = [
