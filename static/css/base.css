@@ -1,0 +1,177 @@
+html {
+	height: 100%;
+}
+
+body {
+	background: url('/media/gym1.jpg') no-repeat center center fixed;
+	background-size: cover;
+	height: calc(100vh - 164px);
+	color: #555 font-family: 'Lato';
+}
+
+/* from Bulma */
+.icon {
+	align-items: center;
+	display: inline-flex;
+	justify-content: center;
+	height: 1.5rem;
+	width: 1.5rem;
+}
+
+.logo-font {
+	text-transform: uppercase;
+}
+
+.main-logo-link {
+	width: fit-content;
+}
+
+.shop-now-button {
+	background: black;
+	color: white;
+	min-width: 260px;
+	border-radius: 30px;
+}
+
+.btn-black {
+	background: black;
+	color: white;
+}
+
+.shop-now-button:hover,
+.shop-now-button:active,
+.shop-now-button:focus,
+.btn-black:hover,
+.btn-black:active,
+.btn-black:focus {
+	background: #2222;
+	color: white;
+}
+
+.text-black {
+	color: #000 !important;
+}
+
+.border-black {
+	border: 1px solid black !important;
+}
+
+.bg-black {
+	background: #000 !important;
+}
+
+.bg-black {
+	background-color: #ff0000 !important;
+	/* tan color light brown */
+}
+
+.overlay {
+	height: 100%;
+	width: 100%;
+	top: 0;
+	left: 0;
+	position: fixed;
+	background: white;
+	z-index: -1;
+}
+
+
+.btn-outline:hover,
+.btn-outline:active,
+.btn-outline:focus {
+	background: black;
+	color: white;
+	background-color: white;
+}
+
+.btn-white-green {
+	background-color: #06a506;
+	color: white;
+}
+
+.btn-white-green:hover {
+	background-color: #027702;
+	/* dark green background on hover */
+	color: white;
+	/* keep text readable */
+}
+
+/*-------------------------------------------------------------- # Hero Section --------------------------------------------------------------*/
+#hero:before {
+	content: "";
+	/* background: rgba(63, 60, 60, 0.6); */
+	position: absolute;
+	bottom: 0;
+	top: 0;
+	left: 0;
+	right: 0;
+}
+
+#hero .container {
+	position: relative;
+	padding-top: 74px;
+	text-align: center;
+}
+
+#hero h1 {
+	margin: 100px 0 0 0;
+	font-size: 56px;
+	font-weight: 70;
+	line-height: 90px;
+	color: #fff;
+	font-family: "Poppins", sans-serif;
+}
+
+.overlay {
+	height: 100%;
+	width: 100%;
+	top: 0;
+	left: 0;
+	position: fixed;
+	background: white;
+	z-index: -1;
+}
+
+
+#hero h1 span {
+	color: #ffc451;
+}
+
+#hero h2 {
+	color: rgba(255, 255, 255, 0.9);
+	margin: 10px 0 0 0;
+	font-size: 24px;
+}
+
+/* Slightly larger container on xl screens */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 80%;
+  }
+}
+
+/* fixed top navbar only on medium and up */
+@media (min-width: 992px) {
+    .fixed-top-desktop-only {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 1030;
+    }
+
+    .header-container {
+        padding-top: 164px;
+    }
+}
+
+/* pad the top a bit when navbar is collapsed on mobile */
+@media (max-width: 991px) {
+    .header-container {
+        padding-top: 116px;
+    }
+
+    body {
+        height: calc(100vh - 116px);
+    }
+}
