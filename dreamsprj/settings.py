@@ -43,7 +43,13 @@ INSTALLED_APPS = [
     'allauth.socialaccount',  # django-allauth social account
     'home',  # our home app
     'products',  # products app
+    'crispy_forms',  # django-crispy-forms
+    'crispy_bootstrap4',  # bootstrap4 theme for crispy-forms
 ]
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
