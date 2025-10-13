@@ -1,0 +1,10 @@
+{% for product in products %}
+  <div>
+    <h3>
+      <a href="{% url 'products:product_detail' product.slug %}">
+        {{ product.name }}
+      </a>
+    </h3>
+    <p>${{ product.price }}</p>
+  </div>
+{% endfor %}
