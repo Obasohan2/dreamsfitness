@@ -43,7 +43,7 @@
                     {% if product.category %}
                         <a href="{% url 'products:category_products' product.category.slug %}"
                            class="text-decoration-none">
-                           {{ product.category.name }}
+                            {{ product.category.name }}
                         </a>
                     {% else %}
                         <span class="text-secondary">Uncategorized</span>
@@ -62,20 +62,36 @@
                 <p>{{ product.description }}</p>
             </div>
 
-            <!-- Price and Add to Cart -->
-            <div class="border-top border-bottom py-3 mb-4">
-                <h3 class="text-primary">£{{ product.price }}</h3>
-                <form method="post" action="{% url 'add_to_cart' product.slug %}">
-                    {% csrf_token %}
-                    <div class="input-group mb-3" style="max-width: 220px;">
-                        <input type="number" name="quantity" class="form-control"
-                               value="1" min="1" max="10">
-                        <button class="btn btn-success" type="submit">
-                            <i class="fas fa-shopping-cart me-2"></i> Add to Cart
-                        </button>
-                    </div>
-                </form>
-            </div>
+    <!-- Price and Add to Cart -->
+<div class="border-top border-bottom py-3 mb-4">
+    <h3 class="text-primary">£{{ product.price }}</h3>
+
+    <!-- Add to Cart Form -->
+    <form method="post" action="{% url 'cart:add_to_cart' product.id %}">
+        {% csrf_token %}
+        <div class="input-group mb-3" style="max-width: 250px;">
+            <input type="number"
+                   name="quantity"
+                   class="form-control"
+                   value="1"
+                   min="1"
+                   max="10">
+            <button class="btn btn-success" type="submit">
+                <i class="fas fa-shopping-cart me-2"></i> Add to Cart
+            </button>
+        </div>
+    </form>
+
+    <!-- Action Buttons -->
+    <div class="d-flex gap-2">
+        <a href="{% url 'products:all_products' %}" class="btn btn-outline-secondary">
+            ← Keep Shopping
+        </a>
+        <a href="{% url 'cart:cart_detail' %}" class="btn btn-primary">
+            View Cart →
+        </a>
+    </div>
+</div>
 
             <!-- Share Buttons (optional include) -->
             {# {% include 'snippets/share.html' %} #}

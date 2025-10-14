@@ -38,6 +38,11 @@ body {
 	color: white;
 }
 
+.nav-item .badge {
+    font-size: 0.7rem;
+    padding: 0.3em 0.45em;
+}
+
 .shop-now-button:hover,
 .shop-now-button:active,
 .shop-now-button:focus,

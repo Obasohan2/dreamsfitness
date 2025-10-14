@@ -1,47 +1,12 @@
-from decimal import Decimal
-from products.models import Product
+from django.urls import path
+from . import views
 
+app_name = 'cart'  # 👈 IMPORTANT — allows namespacing like 'cart:update_cart'
 
-class Cart:
-    def __init__(self, request):
-        self.session = request.session
-        cart = self.session.get('cart')
-        if not cart:
-            cart = self.session['cart'] = {}
-        self.cart = cart
-
-    def add(self, product, quantity=1):
-        product_id = str(product.id)
-        if product_id not in self.cart:
-            self.cart[product_id] = {'quantity': 0, 'price': str(product.price)}
-        self.cart[product_id]['quantity'] += quantity
-        self.save()
-
-    def remove(self, product):
-        product_id = str(product.id)
-        if product_id in self.cart:
-            del self.cart[product_id]
-            self.save()
-
-    def save(self):
-        self.session.modified = True
-
-    def __iter__(self):
-        product_ids = self.cart.keys()
-        products = Product.objects.filter(id__in=product_ids)
-        for product in products:
-            item = self.cart[str(product.id)]
-            item['product'] = product
-            item['price'] = Decimal(item['price'])
-            item['total_price'] = item['price'] * item['quantity']
-            yield item
-
-    def __len__(self):
-        return sum(item['quantity'] for item in self.cart.values())
-
-    def get_total_price(self):
-        return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())
-
-    def clear(self):
-        del self.session['cart']
-        self.save()
+urlpatterns = [
+    path('', views.cart_detail, name='cart_detail'),
+    path('add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    path('update/<int:product_id>/', views.update_cart, name='update_cart'),  # 👈 add this
+    path('remove/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
+    path('clear/', views.clear_cart, name='clear_cart'),
+]

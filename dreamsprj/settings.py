@@ -79,10 +79,13 @@ TEMPLATES = [
                 'django.template.context_processors.request',  # required by allauth
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # ✅ Add this line:
+                'cart.context_processors.cart_context',
             ],
         },
     },
 ]
+
 # Authentication backends
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
@@ -91,6 +94,9 @@ AUTHENTICATION_BACKENDS = [
     # `allauth` specific authentication methods, such as login by e-mail
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
+
+CART_SESSION_ID = 'cart' # Cart session ID
+
 
 SITE_ID = 1
 
