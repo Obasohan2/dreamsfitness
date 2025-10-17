@@ -80,6 +80,12 @@ body {
 	z-index: -1;
 }
 
+/* cart icon badge size */
+.badge {
+	font-size: 0.7rem;
+	padding: 0.35em 0.55em;
+}
+
 
 .btn-outline:hover,
 .btn-outline:active,
