@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <h2 class="text-center mb-4">Choose Your Subscription Plan</h2>
+
+    <div class="row">
+        {% for plan in plans %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm {% if plan.highlight_status %}border-primary{% endif %}">
+                <div class="card-body text-center">
+                    <h4 class="card-title">{{ plan.title }}</h4>
+                    <h5 class="card-text mb-3 text-success">${{ plan.price }}</h5>
+                    <p class="text-muted">{{ plan.validity_days }} days validity</p>
+                    <ul class="list-group list-group-flush mb-3">
+                        {% for feature in plan.features.all %}
+                            <li class="list-group-item">{{ feature.title }}</li>
+                        {% endfor %}
+                    </ul>
+                    <a href="{% url 'plan_detail' plan.id %}" class="btn btn-primary btn-block">
+                        Subscribe Now
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

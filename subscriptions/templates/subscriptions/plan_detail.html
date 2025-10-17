@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-5">
+    <div class="card mx-auto shadow-sm" style="max-width: 600px;">
+        <div class="card-body text-center">
+            <h3>{{ plan.title }}</h3>
+            <p class="lead text-success">${{ plan.price }}</p>
+            <p><strong>Validity:</strong> {{ plan.validity_days }} days</p>
+
+            <h5 class="mt-4">Features:</h5>
+            <ul class="list-group list-group-flush mb-3">
+                {% for feature in plan.features.all %}
+                <li class="list-group-item">{{ feature.title }}</li>
+                {% endfor %}
+            </ul>
+
+            <form action="{% url 'checkout' plan.id %}" method="get">
+                <button class="btn btn-primary btn-lg btn-block">Proceed to Checkout</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
