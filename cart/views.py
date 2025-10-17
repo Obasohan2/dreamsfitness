@@ -1,6 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
+from django.shortcuts import redirect, get_object_or_404, render
 from products.models import Product
 from .cart import Cart
+
 
 def cart_detail(request):
     """Display the cart contents."""
@@ -11,13 +13,15 @@ def cart_detail(request):
         'total_price': cart.get_total_price(),
     })
 
+
 def add_to_cart(request, product_id):
     """Add a product to the cart."""
     product = get_object_or_404(Product, id=product_id)
     quantity = int(request.POST.get('quantity', 1))
     cart = Cart(request)
     cart.add(product=product, quantity=quantity)
-    return redirect('cart:cart_detail')
+    return redirect(request.META.get('HTTP_REFERER', 'cart:cart_detail'))
+
 
 def update_cart(request, product_id):
     """Update product quantity in the cart."""
@@ -27,12 +31,14 @@ def update_cart(request, product_id):
     cart.add(product=product, quantity=quantity, update_quantity=True)
     return redirect('cart:cart_detail')
 
+
 def remove_from_cart(request, product_id):
     """Remove a product from the cart."""
     product = get_object_or_404(Product, id=product_id)
     cart = Cart(request)
     cart.remove(product)
-    return redirect('cart:cart_detail')
+    return redirect(request.META.get('HTTP_REFERER', 'cart:cart_detail'))
+
 
 def clear_cart(request):
     """Remove all items from the cart."""

@@ -1,6 +1,7 @@
 from decimal import Decimal
 from .cart import Cart
 
+
 def cart_contents(request):
     """
     Make cart data available in all templates.

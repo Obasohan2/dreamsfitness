@@ -106,6 +106,36 @@ body {
 	color: white;
 	/* keep text readable */
 }
+  
+.table td .d-flex.align-items-center img {
+	margin-right: 1rem;   /* increase space between image and text */
+    border-radius: 8px;
+}
+
+    /* Make product name slightly bolder */
+.table td strong.text-dark {
+	font-size: 1rem;
+    display: block;
+}
+
+    /* Limit description width gracefully and soften color */
+.table td small.text-muted {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #6c757d;
+    max-width: 350px;
+    display: block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+    /* Slightly larger table cells for breathing space */
+.table td {
+	padding-top: 1rem;
+    padding-bottom: 1rem;
+    vertical-align: middle;
+}
+
 
 /*-------------------------------------------------------------- # Hero Section --------------------------------------------------------------*/
 #hero:before {

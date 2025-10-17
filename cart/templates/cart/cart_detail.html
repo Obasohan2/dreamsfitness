@@ -39,20 +39,21 @@
                         {% for item in cart_items %}
                         <tr>
                             <td>
-                                <div class="d-flex align-items-center">
-                                    <img 
-                                        src="{% if item.product.images %}{{ item.product.images.url }}{% else %}{{ MEDIA_URL }}photos/noimage.png{% endif %}"
-                                        alt="{{ item.product.name }}"
-                                        class="rounded me-3 border"
-                                        style="width: 70px; height: 70px; object-fit: cover;"
-                                    >
-                                    <div>
-                                        <strong class="text-dark">{{ item.product.name }}</strong><br>
-                                        {% if item.product.description %}
-                                            <small class="text-muted">{{ item.product.description|truncatewords:10 }}</small>
-                                        {% endif %}
-                                    </div>
-                                </div>
+                               <div class="d-flex align-items-center">
+    <img 
+        src="{% if item.product.images %}{{ item.product.images.url }}{% else %}{{ MEDIA_URL }}photos/noimage.png{% endif %}"
+        alt="{{ item.product.name }}"
+        class="rounded me-3 border"
+        style="width: 70px; height: 70px; object-fit: cover;"
+    >
+    <div>
+        <strong class="text-dark">{{ item.product.name }}</strong><br>
+        {% if item.product.description %}
+            <small class="text-muted">{{ item.product.description|truncatewords:10 }}</small>
+        {% endif %}
+    </div>
+</div>
+
                             </td>
 
                             <td class="text-end">£{{ item.product.price|floatformat:2 }}</td>
@@ -183,8 +184,36 @@
 
 {% block extra_css %}
 <style>
-    .card-body { padding: 1rem 1.25rem; }
-    .btn { border-radius: 0.4rem; }
+    
+    .table td .d-flex.align-items-center img {
+        margin-right: 1.25rem;   /* increase space between image and text */
+        border-radius: 8px;
+    }
+
+    /* Make product name slightly bolder */
+    .table td strong.text-dark {
+        font-size: 1rem;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    /* Limit description width gracefully and soften color */
+    .table td small.text-muted {
+        font-size: 0.9rem;
+        line-height: 1.4;
+        color: #6c757d;
+        max-width: 350px;
+        display: block;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+
+    /* Slightly larger table cells for breathing space */
+    .table td {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        vertical-align: middle;
+    }
 </style>
 {% endblock %}
 

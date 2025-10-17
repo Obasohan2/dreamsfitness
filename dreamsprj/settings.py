@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'home',  # our home app
     'products',  # products app
     'cart', # cart app
+    'subscriptions',  # subscriptions app
     'crispy_forms',  # django-crispy-forms
     'crispy_bootstrap4',  # bootstrap4 theme for crispy-forms
 ]
