@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block page_header %}
+<div class="container header-container">
+  <div class="row">
+    <div class="col text-center"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="overlay"></div>
+<div class="container my-5">
+
+  <section class="container my-4">
+    <h1 class="text-center mb-4 section-heading border-bottom pb-2">Our Pricing Plans</h1>
+
+    <!-- ====== PLAN CARDS ====== -->
+    <main>
+      <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+        {% for plan in plans %}
+        <div class="col">
+          <div class="card mb-4 rounded-3 shadow-sm {% if plan.highlight_status %}border-primary{% endif %}">
+            {% if plan.highlight_status %}
+            <div class="card-header py-3 text-white bg-primary border-primary position-relative">
+              <h4 class="my-0 fw-normal">{{ plan.title }}</h4>
+              <span class="badge bg-warning text-dark position-absolute top-0 start-50 translate-middle rounded-pill mt-2">Most Popular</span>
+            </div>
+            {% else %}
+            <div class="card-header py-3 bg-light">
+              <h4 class="my-0 fw-normal">{{ plan.title }}</h4>
+            </div>
+            {% endif %}
+            <div class="card-body">
+              <h1 class="card-title pricing-card-title">£{{ plan.price }}
+                <small class="text-muted fw-light">/{{ plan.validity_days }} Days</small>
+              </h1>
+
+              <p class="text-success mb-2">Member Capacity: {{ plan.max_member }}</p>
+
+              <ul class="list-unstyled mt-3 mb-4 text-start">
+                {% for feature in plan.subplanfeature_set.all %}
+                  <li><i class="bi bi-check-lg text-success me-2"></i>{{ feature.title }}</li>
+                {% empty %}
+                  <li class="text-muted">No features added</li>
+                {% endfor %}
+              </ul>
+
+              <a href="#" class="w-100 btn btn-lg btn-outline-primary">Get started</a>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </main>
+
+    <!-- ====== COMPARISON TABLE ====== -->
+    <h2 class="display-6 text-center mb-4">Compare plans</h2>
+  <div class="table-responsive">
+    <table class="table text-center">
+      <thead>
+        <tr>
+          <th style="width: 34%;"></th>
+          {% for plan in plans %}
+          <th style="width: 22%;">{{plan.title}}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for feature in dfeatures %}
+        <tr>
+          <th scope="row" class="text-start">{{feature.title}}</th>
+          {% for plan in plans %}
+          <td>
+            {% if plan in feature.subplan.all %}
+            <i class="bi bi-check-lg"></i>
+            {% else %}
+            <i class="bi bi-x-lg text-danger"></i>
+            {% endif %}
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</main>
+</section>
+{% endblock %}
+
+
+
+<style>
+  body {
+  background-color: #fff;
+  font-family: "Poppins", sans-serif;
+}
+
+/* === Card Styling === */
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 20px;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 1rem 2rem rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  border-radius: 20px 20px 0 0 !important;
+  border: none;
+}
+
+.featured {
+  border: 3px solid #0d6efd;
+}
+
+.card-title {
+  font-size: 2.5rem;
+  color: #0d6efd;
+}
+
+/* === Buttons === */
+.btn-outline-primary {
+  border-radius: 50px;
+  transition: all 0.3s;
+}
+
+.btn-outline-primary:hover {
+  background-color: #0d6efd;
+  color: #fff;
+}
+
+/* === Comparison Table === */
+.table thead th {
+  background-color: #f8f9fa;
+  font-weight: 700;
+  color: #0d6efd;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.table tbody th {
+  font-weight: 500;
+}
+
+.table tbody tr:hover {
+  background-color: #f2f6ff;
+  transition: background 0.3s ease;
+}
+
+.bi-check-lg {
+  color: #198754;
+}
+
+.bi-x-lg {
+  color: #dc3545;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .card-title {
+    font-size: 2rem;
+  }
+  h1, h2 {
+    font-size: 1.75rem;
+  }
+}
+
+</style>

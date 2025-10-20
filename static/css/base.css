@@ -137,6 +137,42 @@ body {
 }
 
 
+/*    compare plans       */
+
+.table {
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  font-size: 0.95rem;
+}
+
+.table thead th {
+  background-color: #0d6efd;
+  color: #fff;
+  border: none;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: 10px 10px 0 0;
+}
+
+.table tbody tr {
+  background-color: #fff;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.bi-check-lg {
+  color: #198754;
+}
+
+.bi-x-lg {
+  color: #dc3545;
+}
+
+
 /*-------------------------------------------------------------- # Hero Section --------------------------------------------------------------*/
 #hero:before {
 	content: "";
