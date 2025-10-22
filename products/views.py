@@ -1,10 +1,12 @@
 from django.shortcuts import render, get_object_or_404
-from .models import Product, Category
 from django.db.models import Q
+from .models import Product, Category
 
 
 def all_products(request):
-    """Display all products, with sorting and filtering."""
+    """
+    Display all available products with sorting, category filtering, and search.
+    """
     products = Product.objects.filter(is_available=True)
     query = None
     category = None
@@ -15,19 +17,20 @@ def all_products(request):
     if 'sort' in request.GET:
         sortkey = request.GET['sort']
         sort = sortkey
-        if sortkey == 'price':
-            sortkey = 'price'
-        elif sortkey == 'rating':
-            sortkey = 'rating'
-        elif sortkey == 'category':
-            sortkey = 'category__name'
-        else:
-            sortkey = 'name'
 
-        if 'direction' in request.GET:
-            direction = request.GET['direction']
-            if direction == 'desc':
-                sortkey = f'-{sortkey}'
+        sort_mapping = {
+            'price': 'price',
+            'rating': 'rating',
+            'category': 'category__name',
+            'name': 'name'
+        }
+        sortkey = sort_mapping.get(sortkey, 'name')
+
+        if request.GET.get('direction') == 'desc':
+            direction = 'desc'
+            sortkey = f'-{sortkey}'
+        else:
+            direction = 'asc'
 
         products = products.order_by(sortkey)
 
@@ -37,13 +40,14 @@ def all_products(request):
         category = get_object_or_404(Category, slug=category_slug)
         products = products.filter(category=category)
 
-    # --- Optional: Search ---
+    # --- Search ---
     if 'q' in request.GET:
-        query = request.GET['q']
-        products = products.filter(
-            Q(name__icontains=query) |
-            Q(description__icontains=query)
-        )
+        query = request.GET['q'].strip()
+        if query:
+            products = products.filter(
+                Q(name__icontains=query) |
+                Q(description__icontains=query)
+            )
 
     current_sorting = f'{sort}_{direction}' if sort else 'None'
 
@@ -58,7 +62,9 @@ def all_products(request):
 
 
 def category_products(request, slug):
-    """Display products for a specific category."""
+    """
+    Display products in a specific category (only available ones).
+    """
     category = get_object_or_404(Category, slug=slug)
     products = Product.objects.filter(category=category, is_available=True)
 
@@ -70,9 +76,14 @@ def category_products(request, slug):
 
 
 def product_detail(request, slug):
-    """Display single product details."""
+    """
+    Display single product details and related products.
+    """
     product = get_object_or_404(Product, slug=slug, is_available=True)
-    related_products = Product.objects.filter(category=product.category).exclude(id=product.id)[:4]
+    related_products = Product.objects.filter(
+        category=product.category,
+        is_available=True
+    ).exclude(id=product.id)[:4]
 
     context = {
         'product': product,

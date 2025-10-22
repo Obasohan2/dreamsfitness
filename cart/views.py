@@ -23,12 +23,20 @@ def add_to_cart(request, product_id):
     return redirect(request.META.get('HTTP_REFERER', 'cart:cart_detail'))
 
 
+def buy_now(request, product_id):
+    """Buy a single product instantly."""
+    product = get_object_or_404(Product, id=product_id)
+    cart = Cart(request)
+    cart.add(product=product, quantity=1, override_quantity=True)
+    return redirect('cart:cart_detail')  # or 'checkout:checkout_page'
+
+
 def update_cart(request, product_id):
     """Update product quantity in the cart."""
+    cart = Cart(request)
     product = get_object_or_404(Product, id=product_id)
     quantity = int(request.POST.get('quantity', 1))
-    cart = Cart(request)
-    cart.add(product=product, quantity=quantity, update_quantity=True)
+    cart.add(product=product, quantity=quantity, override_quantity=True)
     return redirect('cart:cart_detail')
 
 

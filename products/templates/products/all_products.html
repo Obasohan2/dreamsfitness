@@ -1,10 +1,30 @@
-{% for product in products %}
-  <div>
-    <h3>
-      <a href="{% url 'products:product_detail' product.slug %}">
-        {{ product.name }}
-      </a>
-    </h3>
-    <p>${{ product.price }}</p>
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+  <h2 class="text-center mb-4">Products</h2>
+
+  <div class="row">
+    {% for product in products %}
+      <div class="col-md-3 mb-4">
+        <div class="card h-100 shadow-sm border-0">
+          <a href="{% url 'products:product_detail' product.slug %}">
+            {% if product.image %}
+              <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+            {% else %}
+              <img src="{% static 'images/placeholder.png' %}" class="card-img-top" alt="No image">
+            {% endif %}
+          </a>
+          <div class="card-body text-center">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text text-muted">${{ product.price }}</p>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-center">No products available.</p>
+    {% endfor %}
   </div>
-{% endfor %}
+</div>
+{% endblock %}
