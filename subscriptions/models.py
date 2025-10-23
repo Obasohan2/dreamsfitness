@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 
 
-class SubPlan(models.Model):
+class SubPlan(models.Model):  # subscription plans
 	title = models.CharField(max_length=150)
 	price = models.IntegerField()
 	max_member = models.IntegerField(null=True)
@@ -14,7 +14,7 @@ class SubPlan(models.Model):
 		return self.title
 
 
-class SubPlanFeature(models.Model):
+class SubPlanFeature(models.Model):  # features for subscription plans
 	subplan = models.ManyToManyField(SubPlan)
 	title = models.CharField(max_length=150)
 
@@ -22,7 +22,7 @@ class SubPlanFeature(models.Model):
 		return self.title
 
 
-class DynamicFeature(models.Model):
+class DynamicFeature(models.Model):   # dynamic features for subscription plans
     title = models.CharField(max_length=100)
     subplan = models.ManyToManyField(SubPlan)
     

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'allauth',  # django-allauth
     'allauth.account',  # django-allauth account
     'allauth.socialaccount',  # django-allauth social account
+    'accounts',  # our custom accounts app
     'home',  # our home app
     'products',  # products app
     'cart',  # cart app
