@@ -7,25 +7,113 @@
 </div>
 {% endblock %}
 {% block content %}
-<div class="container my-5">
-  <div class="card shadow-sm p-4">
-    <h2 class="text-center mb-3">Checkout - {{ plan.title }}</h2>
-    <p class="text-center text-muted">
-      <strong>£{{ plan.price }}</strong> / {{ plan.validity_days }} days
-    </p>
-    <hr>
-    <h5>Included Features:</h5>
-    <ul>
-      {% for f in plan.subplanfeature_set.all %}
-        <li><i class="bi bi-check-circle text-success"></i> {{ f.title }}</li>
-      {% empty %}
-        <li class="text-muted">No features listed.</li>
-      {% endfor %}
-    </ul>
-    <hr>
-    <div class="text-center">
-      <a href="#" class="btn btn-primary btn-lg">Proceed to Payment</a>
+<div class="overlay"></div>
+<main>
+  <section class="container my-5">
+    <h1 class="text-center mb-4 border-bottom pb-2">Checkout</h1>
+
+    <div class="table-responsive shadow-sm">
+      <table class="table table-bordered align-middle">
+        <thead class="table-warning">
+          <tr>
+            <th>Plan</th>
+            <th>Plan Detail</th>
+            <th>Payment For</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <table class="table table-bordered mb-0">
+                <tr><th>Name</th><td>{{ plan.title }}</td></tr>
+                <tr><th>Price</th><td>£{{ plan.price }}</td></tr>
+                <tr><th>Max Member</th><td>{{ plan.max_member|default:30 }}</td></tr>
+                <tr><th>Already Registered</th><td>{{ plan.total_members|default:0 }}</td></tr>
+                {% comment %} <tr><th>Balance Seats</th><td>{{ plan.max_member|default:30|add:"-{{ plan.total_members|default:0 }}" }}</td></tr> {% endcomment %}
+                <tr>
+                    <th>Balance Seats</th>
+                    <td>
+                        {% if balance_seats > 0 %}
+                        {{ balance_seats }}
+                        {% else %}
+                        <span class="text-danger fw-bold">Full</span>
+                        {% endif %}
+                    </td>
+                </tr>
+
+              </table>
+            </td>
+            <td>
+              <ul class="list-unstyled mb-0">
+                {% for feature in plan.subplanfeature_set.all %}
+                  <li><i class="bi bi-check-circle text-success"></i> {{ feature.title }}</li>
+                {% empty %}
+                  <li class="text-muted">No features listed</li>
+                {% endfor %}
+              </ul>
+            </td>
+            <td>
+              <table class="table table-bordered mb-0">
+                {% for discount in plan.plandiscount_set.all %}
+                  <tr>
+                    <td>
+                      <input data-planprice="{{ plan.price }}" 
+                             data-discount="{{ discount.total_discount }}" 
+                             type="radio" 
+                             id="validity{{ discount.id }}" 
+                             name="validity" 
+                             class="select-validity" 
+                             value="{{ discount.total_months }}">
+                    </td>
+                    <th><label for="validity{{ discount.id }}">{{ discount.total_months }} Month</label></th>
+                    <td>{{ discount.total_discount }}%</td>
+                  </tr>
+                {% empty %}
+                  <tr><td colspan="3" class="text-muted text-center">No discounts available</td></tr>
+                {% endfor %}
+              </table>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot class="table-info">
+          <tr>
+            <td></td>
+            <th>Total Amount</th>
+            <td><b>£<span class="totalAmount">{{ plan.price }}</span></b></td>
+          </tr>
+          <tr>
+            <td colspan="2"></td>
+            <td>
+              <form method="post" action="{% url 'checkout_session' plan.id %}">
+                {% csrf_token %}
+                {% comment %} <input type="submit" value="Proceed to Payment" class="btn btn-primary w-100"> {% endcomment %}
+                {% if is_full %}
+                <button type="button" class="btn btn-secondary w-100" disabled>
+                    Plan Full — Seats Unavailable
+                </button>
+                {% else %}
+                <input type="submit" value="Proceed to Payment" class="btn btn-primary w-100">
+                {% endif %}
+              </form>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
     </div>
-  </div>
-</div>
+  </section>
+</main>
+
+{% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> {% endcomment %}
+<script>
+$(function() {
+  $(".select-validity").on('click', function() {
+    const planPrice = parseFloat($(this).data('planprice'));
+    const months = parseInt($(this).val());
+    const discount = parseFloat($(this).data('discount'));
+    let total = planPrice * months;
+    if (discount > 0) total -= total * discount / 100;
+    $(".totalAmount").text(total.toFixed(2));
+  });
+});
+</script>
 {% endblock %}

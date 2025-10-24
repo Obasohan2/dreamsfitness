@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from itertools import chain
 from django.contrib.auth.decorators import login_required
 from .models import SubPlan, SubPlanFeature, DynamicFeature
@@ -29,8 +29,38 @@ def pricing_view(request):
     })
 
 
+# @login_required
+# def checkout(request, plan_id):
+#     plan = get_object_or_404(SubPlan.objects.prefetch_related('subplanfeature_set'), pk=plan_id)
+#     return render(request, 'subscriptions/checkout.html', {'plan': plan})
+
+
 @login_required
 def checkout(request, plan_id):
-    plan = get_object_or_404(SubPlan.objects.prefetch_related('subplanfeature_set'), pk=plan_id)
-    return render(request, 'subscriptions/checkout.html', {'plan': plan})
+    plan = get_object_or_404(
+        SubPlan.objects.prefetch_related('subplanfeature_set', 'plandiscount_set'),
+        pk=plan_id
+    )
 
+    total_members = getattr(plan, 'total_members', 0)
+    balance_seats = (plan.max_member or 0) - total_members
+    is_full = balance_seats <= 0
+
+    return render(request, 'subscriptions/checkout.html', {
+        'plan': plan,
+        'balance_seats': balance_seats,
+        'is_full': is_full,
+    })
+
+
+
+@login_required
+def checkout_session(request, plan_id):
+    """
+    Placeholder for checkout session (Stripe or PayPal integration later).
+    For now, it just redirects back to checkout confirmation.
+    """
+    plan = get_object_or_404(SubPlan, pk=plan_id)
+
+    # Example placeholder — later this can redirect to Stripe session
+    return redirect('checkout', plan_id=plan.id)

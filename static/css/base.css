@@ -218,6 +218,13 @@ body {
 	font-size: 24px;
 }
 
+button[disabled],  
+input[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+
 /* Slightly larger container on xl screens */
 @media (min-width: 1200px) {
   .container {

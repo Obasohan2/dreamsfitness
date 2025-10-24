@@ -134,7 +134,8 @@
                 <div class="card mt-4">
                     <div class="card-body">
                         <h4 class="card-title mb-3">Write a Review</h4>
-                        <form method="post" action="{% url 'add_review' product.slug %}">
+                        {% comment %} <form method="post" action="{% url 'add_review' product.slug %}"> {% endcomment %}
+                        <form method="post" action="{% url 'products:add_review' product.slug %}">
                             {% csrf_token %}
                             {{ review_form|crispy }}
                             <button type="submit" class="btn btn-primary mt-3">

@@ -1,6 +1,9 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages 
 from django.db.models import Q
-from .models import Product, Category
+from .models import Product, Category, Review
+from .forms import ReviewForm
+from django.contrib.auth.decorators import login_required
 
 
 def all_products(request):
@@ -90,3 +93,30 @@ def product_detail(request, slug):
         'related_products': related_products,
     }
     return render(request, 'products/product_detail.html', context)
+
+
+@login_required
+def add_review(request, slug):
+    product = get_object_or_404(Product, slug=slug)
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.product = product
+            review.user = request.user
+            review.save()
+            #  Add success message
+            messages.success(request, "Your review has been submitted successfully!")
+            return redirect('products:product_detail', slug=slug)
+        else:
+            # Optional: add error message if invalid form
+            messages.error(request, "There was an error submitting your review. Please check the form.")
+    else:
+        form = ReviewForm()
+      #  Add the review form to the product detail context
+    return render(request, 'products/product_detail.html', {
+        'product': product,
+        'review_form': form,
+        'reviews': product.reviews.all(),
+    })
