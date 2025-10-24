@@ -18,6 +18,9 @@
       <div class="card shadow-sm border-0">
         <div class="card-body p-4">
           <h3 class="text-center mb-4">Login</h3>
+          {% if msg %}
+					<p class="text-success">{{msg}}</p>
+					{% endif %}
           <form method="POST" novalidate>
             {% csrf_token %}
             {{ form|crispy }}
