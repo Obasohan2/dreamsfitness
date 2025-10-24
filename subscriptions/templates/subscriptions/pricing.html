@@ -47,7 +47,16 @@
                 {% endfor %}
               </ul>
 
-              <a href="#" class="w-100 btn btn-lg btn-outline-primary">Get started</a>
+              {% if user.is_authenticated %}
+              <a href="{% url 'checkout' plan.id %}" class="w-100 btn btn-lg btn-outline-primary">
+                Get started
+              </a>
+              {% else %}
+              <a href="{% url 'login' %}" class="w-100 btn btn-lg btn-outline-secondary">
+                Get Started
+              </a>
+              {% endif %}
+
             </div>
           </div>
         </div>

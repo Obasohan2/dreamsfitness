@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from itertools import chain
+from django.contrib.auth.decorators import login_required
 from .models import SubPlan, SubPlanFeature, DynamicFeature
 
 
@@ -26,3 +27,10 @@ def pricing_view(request):
         'plans': plans,
         'dfeatures': unique_features,
     })
+
+
+@login_required
+def checkout(request, plan_id):
+    plan = get_object_or_404(SubPlan.objects.prefetch_related('subplanfeature_set'), pk=plan_id)
+    return render(request, 'subscriptions/checkout.html', {'plan': plan})
+

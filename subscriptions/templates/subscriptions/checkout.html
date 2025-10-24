@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block page_header %}
+<div class="container header-container">
+  <div class="row">
+    <div class="col text-center"></div>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container my-5">
+  <div class="card shadow-sm p-4">
+    <h2 class="text-center mb-3">Checkout - {{ plan.title }}</h2>
+    <p class="text-center text-muted">
+      <strong>£{{ plan.price }}</strong> / {{ plan.validity_days }} days
+    </p>
+    <hr>
+    <h5>Included Features:</h5>
+    <ul>
+      {% for f in plan.subplanfeature_set.all %}
+        <li><i class="bi bi-check-circle text-success"></i> {{ f.title }}</li>
+      {% empty %}
+        <li class="text-muted">No features listed.</li>
+      {% endfor %}
+    </ul>
+    <hr>
+    <div class="text-center">
+      <a href="#" class="btn btn-primary btn-lg">Proceed to Payment</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
