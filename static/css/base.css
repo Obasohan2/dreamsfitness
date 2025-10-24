@@ -171,7 +171,6 @@ body {
   color: #dc3545;
 }
 
-
 /*-------------------------------------------------------------- # Hero Section --------------------------------------------------------------*/
 #hero:before {
 	content: "";
@@ -251,3 +250,13 @@ body {
         height: calc(100vh - 116px);
     }
 }
+
+
+
+
+.alert {
+  position: relative;
+  z-index: 9999;
+  margin-bottom: 1rem;
+}
+
