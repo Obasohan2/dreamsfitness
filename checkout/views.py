@@ -2,15 +2,13 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
 from decimal import Decimal
-from django.conf import settings
-import stripe
 
 from products.models import Product
 from subscriptions.models import SubPlan, PlanDiscount
 from cart.cart import Cart
-
-# stripe.api_key = settings.STRIPE_SECRET_KEY
+from .models import Order, OrderItem
 
 
 @login_required
@@ -52,97 +50,101 @@ def checkout_preview(request):
     return render(request, "checkout/checkout_preview.html", context)
 
 
-@require_POST
 @login_required
+@require_POST
 def checkout_session(request):
     """
-    Validates the checkout, applies discounts, and creates a Stripe session (or simulated success).
+    Process checkout locally (no Stripe). Creates order + items, clears cart, and redirects.
     """
     cart = Cart(request)
     plan_id = request.POST.get("plan_id")
     validity_months = request.POST.get("validity")
-    plan = None
-    total_amount = Decimal('0.00')
-    discount_percent = Decimal('0.00')
 
-    # --- Retrieve plan and discount ---
+    plan = None
+    total_amount = Decimal("0.00")
+
+    # --- 1️⃣ Handle Plan ---
     if plan_id:
         plan = get_object_or_404(SubPlan, id=plan_id)
-        plan_price = Decimal(plan.price)
         months = int(validity_months or 1)
+        plan_price = Decimal(plan.price)
 
-        discount_obj = PlanDiscount.objects.filter(plan=plan, total_months=months).first()
-        if discount_obj:
-            discount_percent = Decimal(discount_obj.total_discount)
+        # ✅ FIXED: use 'subplan' instead of 'plan'
+        discount = PlanDiscount.objects.filter(subplan=plan, total_months=months).first()
+        discount_percent = Decimal(discount.total_discount) if discount else Decimal("0.00")
 
         subtotal = plan_price * months
         discounted_amount = subtotal - (subtotal * discount_percent / 100)
         total_amount += discounted_amount
 
-    # --- Add cart total ---
-    cart_total = Decimal(cart.get_total_price()) if len(cart) > 0 else Decimal('0.00')
-    total_amount += cart_total
+    # --- 2️⃣ Handle Cart Items ---
+    for item in cart:
+        product = item["product"]
+        quantity = item["quantity"]
+        price = Decimal(product.price)
+        total_amount += price * quantity
 
-    # --- Seat availability check ---
-    if plan and plan.max_member <= plan.total_members:
-        messages.error(request, "Sorry, this plan is now full.")
-        return redirect("checkout_preview")
-
-    # --- Final total safeguard ---
+    # --- 3️⃣ Validate total ---
     if total_amount <= 0:
         messages.error(request, "Your total amount is invalid.")
         return redirect("checkout_preview")
 
-    # --- (Optional) Stripe checkout logic ---
-    # line_items = []
-    # if plan:
-    #     line_items.append({
-    #         'price_data': {
-    #             'currency': 'gbp',
-    #             'product_data': {'name': f'Subscription - {plan.title}'},
-    #             'unit_amount': int(discounted_amount * 100),
-    #         },
-    #         'quantity': 1,
-    #     })
-    # for item in cart:
-    #     line_items.append({
-    #         'price_data': {
-    #             'currency': 'gbp',
-    #             'product_data': {'name': item['product'].name},
-    #             'unit_amount': int(item['product'].price * 100),
-    #         },
-    #         'quantity': item['quantity'],
-    #     })
-    #
-    # session = stripe.checkout.Session.create(
-    #     payment_method_types=['card'],
-    #     line_items=line_items,
-    #     mode='payment',
-    #     success_url=request.build_absolute_uri('/checkout/success/'),
-    #     cancel_url=request.build_absolute_uri('/checkout/cancel/'),
-    # )
-    #
-    # return redirect(session.url, code=303)
+    # --- 4️⃣ Create Local Order ---
+    order = Order.objects.create(
+        user=request.user,
+        plan=plan,
+        total_amount=total_amount,
+        status="paid",  # or "pending" if manual verification required
+    )
 
-    # --- Simulated success (no Stripe yet) ---
-    messages.success(request, f"Checkout initiated successfully. Total: £{total_amount:.2f}")
-    return redirect("checkout_success")
+    # Create order items for all products
+    for item in cart:
+        product = item["product"]
+        quantity = item["quantity"]
+        price = Decimal(product.price)
+        OrderItem.objects.create(
+            order=order,
+            product=product,
+            name=product.name,
+            quantity=quantity,
+            price=price,
+            total_price=price * quantity,
+        )
+
+    # Create order item for subscription plan if selected
+    if plan:
+        OrderItem.objects.create(
+            order=order,
+            plan=plan,
+            name=f"Subscription - {plan.title}",
+            quantity=1,
+            price=plan.price,
+            total_price=plan.price,
+        )
+        plan.total_members += 1
+        plan.save()
+
+    # --- 5️⃣ Clear cart + redirect to success ---
+    cart.clear()
+    messages.success(request, f"Order #{order.id} completed successfully! Total: £{total_amount:.2f}")
+
+    return redirect(f"{reverse('checkout_success')}?order_id={order.id}")
 
 
 @login_required
 def checkout_success(request):
     """
     After successful checkout:
-    - Activate subscription (if purchased)
-    - Clear cart
-    - Show success page
+    - Show order summary
+    - (Plan activation & cart clearing handled in checkout_session)
     """
-    cart = Cart(request)
-    cart.clear()
-    return render(request, 'checkout/success.html')
+    order_id = request.GET.get("order_id")
+    order = Order.objects.filter(id=order_id, user=request.user).first()
+
+    return render(request, 'checkout/success.html', {"order": order})
 
 
 @login_required
 def checkout_cancel(request):
-    """Handles user cancellation of payment."""
+    """Handles user cancellation of checkout."""
     return render(request, 'checkout/cancel.html')
