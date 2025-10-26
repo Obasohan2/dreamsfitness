@@ -5,7 +5,7 @@ class SubPlan(models.Model):  # Subscription plans
     title = models.CharField(max_length=150)
     price = models.IntegerField()
     max_member = models.IntegerField(null=True, blank=True)
-    total_members = models.PositiveIntegerField(default=0)  # ✅ fixed indentation
+    total_members = models.PositiveIntegerField(default=0)  # Track total members
     highlight_status = models.BooleanField(default=False, null=True)
     validity_days = models.IntegerField(null=True, blank=True)
 
