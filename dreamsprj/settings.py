@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'products',  # products app
     'cart',  # cart app
     'checkout',  # checkout app
+    'checkout.apps.CheckoutConfig',  # use the AppConfig class, not just 'checkout'
     'subscriptions',  # subscriptions app
     'crispy_forms',  # django-crispy-forms
     'crispy_bootstrap4',  # bootstrap4 theme for crispy-forms
