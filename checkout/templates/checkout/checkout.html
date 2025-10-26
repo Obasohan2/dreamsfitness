@@ -6,6 +6,7 @@
   </div>
 </div>
 {% endblock %}
+
 {% block content %}
 <div class="overlay"></div>
 <main>
@@ -22,6 +23,7 @@
           </tr>
         </thead>
         <tbody>
+          {% if plan %}
           <tr>
             <td>
               <table class="table table-bordered mb-0">
@@ -29,7 +31,6 @@
                 <tr><th>Price</th><td>£{{ plan.price }}</td></tr>
                 <tr><th>Max Member</th><td>{{ plan.max_member|default:30 }}</td></tr>
                 <tr><th>Already Registered</th><td>{{ plan.total_members|default:0 }}</td></tr>
-                {% comment %} <tr><th>Balance Seats</th><td>{{ plan.max_member|default:30|add:"-{{ plan.total_members|default:0 }}" }}</td></tr> {% endcomment %}
                 <tr>
                     <th>Balance Seats</th>
                     <td>
@@ -40,7 +41,6 @@
                         {% endif %}
                     </td>
                 </tr>
-
               </table>
             </td>
             <td>
@@ -74,19 +74,40 @@
               </table>
             </td>
           </tr>
+          {% endif %}
         </tbody>
+
+        <!-- Cart Items Section -->
+        {% if cart and cart|length > 0 %}
+        <thead class="table-secondary">
+          <tr>
+            <th colspan="3" class="text-center">Products in Your Cart</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart %}
+          <tr>
+            <td colspan="2">{{ item.product.title }}</td>
+            <td>£{{ item.total_price }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        {% endif %}
+
         <tfoot class="table-info">
           <tr>
             <td></td>
             <th>Total Amount</th>
-            <td><b>£<span class="totalAmount">{{ plan.price }}</span></b></td>
+            <td><b>£<span class="totalAmount">{{ total_price }}</span></b></td>
           </tr>
           <tr>
             <td colspan="2"></td>
             <td>
-              <form method="post" action="{% url 'checkout_session' plan.id %}">
+              <form method="post" action="{% url 'checkout_session' %}">
                 {% csrf_token %}
-                {% comment %} <input type="submit" value="Proceed to Payment" class="btn btn-primary w-100"> {% endcomment %}
+                {% if plan %}
+                <input type="hidden" name="plan_id" value="{{ plan.id }}">
+                {% endif %}
                 {% if is_full %}
                 <button type="button" class="btn btn-secondary w-100" disabled>
                     Plan Full — Seats Unavailable
@@ -103,7 +124,6 @@
   </section>
 </main>
 
-{% comment %} <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> {% endcomment %}
 <script>
 $(function() {
   $(".select-validity").on('click', function() {
@@ -112,6 +132,11 @@ $(function() {
     const discount = parseFloat($(this).data('discount'));
     let total = planPrice * months;
     if (discount > 0) total -= total * discount / 100;
+
+    // Add cart total to plan total
+    const cartTotal = parseFloat('{{ cart.get_total_price|default:0 }}');
+    total += cartTotal;
+
     $(".totalAmount").text(total.toFixed(2));
   });
 });

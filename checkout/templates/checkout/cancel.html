@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block page_header %}
+<div class="container header-container">
+  <div class="row">
+    <div class="col text-center"></div>
+  </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="container mt-5 text-center">
+  <h2 class="text-danger mb-3">❌ Checkout Cancelled</h2>
+  <p>You can return to your cart and make changes before checking out again.</p>
+  <a href="/cart/" class="btn btn-secondary mt-4">Back to Cart</a>
+</div>
+{% endblock %}

@@ -28,4 +28,6 @@ urlpatterns = [
     path('cart/', include('cart.urls', namespace='cart')),
     path('subscriptions/', include('subscriptions.urls')),
     path('', include('home.urls')),
+    path('checkout/', include('checkout.urls')),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

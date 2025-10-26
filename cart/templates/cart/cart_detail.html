@@ -165,7 +165,8 @@
                         {% csrf_token %}
                         <button type="submit" class="btn btn-outline-warning">Clear Cart</button>
                     </form>
-                    <a href="#" class="btn btn-primary">Proceed to Checkout</a>
+                    {% comment %} <a href="#" class="btn btn-primary">Proceed to Checkout</a> {% endcomment %}
+                    <a href="{% url 'checkout' %}" class="btn btn-success">Proceed to Checkout</a>
                 </div>
             </div>
 

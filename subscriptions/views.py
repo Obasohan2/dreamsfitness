@@ -29,12 +29,6 @@ def pricing_view(request):
     })
 
 
-# @login_required
-# def checkout(request, plan_id):
-#     plan = get_object_or_404(SubPlan.objects.prefetch_related('subplanfeature_set'), pk=plan_id)
-#     return render(request, 'subscriptions/checkout.html', {'plan': plan})
-
-
 @login_required
 def checkout(request, plan_id):
     plan = get_object_or_404(
@@ -46,11 +40,12 @@ def checkout(request, plan_id):
     balance_seats = (plan.max_member or 0) - total_members
     is_full = balance_seats <= 0
 
-    return render(request, 'subscriptions/checkout.html', {
-        'plan': plan,
-        'balance_seats': balance_seats,
-        'is_full': is_full,
-    })
+    return render(request, 'checkout/checkout.html', {
+    'plan': plan,
+    'balance_seats': balance_seats,
+    'is_full': is_full,
+})
+
 
 
 
