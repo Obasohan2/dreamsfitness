@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Django built-ins...
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,18 +39,21 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'allauth',  # django-allauth
-    'allauth.account',  # django-allauth account
-    'allauth.socialaccount',  # django-allauth social account
-    'accounts',  # our custom accounts app
-    'home',  # our home app
-    'products',  # products app
-    'cart',  # cart app
-    'checkout',  # checkout app
-    'checkout.apps.CheckoutConfig',  # use the AppConfig class, not just 'checkout'
-    'subscriptions',  # subscriptions app
-    'crispy_forms',  # django-crispy-forms
-    'crispy_bootstrap4',  # bootstrap4 theme for crispy-forms
+
+    # Third-party apps
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'crispy_forms',
+    'crispy_bootstrap4',
+
+    # Local apps
+    'accounts.apps.AccountsConfig',
+    'home',
+    'products.apps.ProductsConfig',
+    'cart',
+    'checkout.apps.CheckoutConfig',
+    'subscriptions.apps.SubscriptionsConfig',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"

@@ -63,13 +63,13 @@ def checkout_session(request):
     plan = None
     total_amount = Decimal("0.00")
 
-    # --- 1️⃣ Handle Plan ---
+    # --- Handle Plan ---
     if plan_id:
         plan = get_object_or_404(SubPlan, id=plan_id)
         months = int(validity_months or 1)
         plan_price = Decimal(plan.price)
 
-        # ✅ FIXED: use 'subplan' instead of 'plan'
+        # use 'subplan' instead of 'plan'
         discount = PlanDiscount.objects.filter(subplan=plan, total_months=months).first()
         discount_percent = Decimal(discount.total_discount) if discount else Decimal("0.00")
 
@@ -77,19 +77,19 @@ def checkout_session(request):
         discounted_amount = subtotal - (subtotal * discount_percent / 100)
         total_amount += discounted_amount
 
-    # --- 2️⃣ Handle Cart Items ---
+    # --- Handle Cart Items ---
     for item in cart:
         product = item["product"]
         quantity = item["quantity"]
         price = Decimal(product.price)
         total_amount += price * quantity
 
-    # --- 3️⃣ Validate total ---
+    # --- Validate total ---
     if total_amount <= 0:
         messages.error(request, "Your total amount is invalid.")
         return redirect("checkout_preview")
 
-    # --- 4️⃣ Create Local Order ---
+    # --- Create Local Order ---
     order = Order.objects.create(
         user=request.user,
         plan=plan,
@@ -124,7 +124,7 @@ def checkout_session(request):
         plan.total_members += 1
         plan.save()
 
-    # --- 5️⃣ Clear cart + redirect to success ---
+    # --- Clear cart + redirect to success ---
     cart.clear()
     messages.success(request, f"Order #{order.id} completed successfully! Total: £{total_amount:.2f}")
 

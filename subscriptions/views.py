@@ -47,8 +47,6 @@ def checkout(request, plan_id):
 })
 
 
-
-
 @login_required
 def checkout_session(request, plan_id):
     """

@@ -4,6 +4,7 @@ from django.db.models import Q
 from .models import Product, Category, Review
 from .forms import ReviewForm
 from django.contrib.auth.decorators import login_required
+from django.db.models import Avg, Count
 
 
 def all_products(request):
@@ -79,20 +80,38 @@ def category_products(request, slug):
 
 
 def product_detail(request, slug):
+  
     """
-    Display single product details and related products.
+     Display single product details and related products.
     """
-    product = get_object_or_404(Product, slug=slug, is_available=True)
-    related_products = Product.objects.filter(
-        category=product.category,
-        is_available=True
-    ).exclude(id=product.id)[:4]
+    product = get_object_or_404(Product, slug=slug)
+
+    # Get all reviews (newest first)
+    reviews = product.reviews.all().select_related("user").order_by("-created")
+
+    # Calculate average rating & count
+    review_stats = product.reviews.aggregate(
+        avg_rating=Avg("rating"),
+        total_reviews=Count("id")
+    )
+
+    review_form = ReviewForm(request.POST or None)
+    if request.method == "POST" and review_form.is_valid():
+        new_review = review_form.save(commit=False)
+        new_review.user = request.user
+        new_review.product = product
+        new_review.save()
+        messages.success(request, "Thanks for your review!")
+        return redirect("products:product_detail", slug=product.slug)
 
     context = {
-        'product': product,
-        'related_products': related_products,
+        "product": product,
+        "reviews": reviews,
+        "review_form": review_form,
+        "avg_rating": review_stats["avg_rating"],
+        "total_reviews": review_stats["total_reviews"],
     }
-    return render(request, 'products/product_detail.html', context)
+    return render(request, "products/product_detail.html", context)
 
 
 @login_required

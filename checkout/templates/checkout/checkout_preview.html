@@ -144,10 +144,18 @@
 <script>
 $(function() {
   const submitBtn = $("input[type=submit]");
-  submitBtn.prop('disabled', true); // initially disabled
+  const hasPlan = {{ plan|yesno:"true,false" }};
+  const hasCart = {{ cart|length|yesno:"true,false" }};
 
+  // Enable submit if no plan but there are products in cart
+  if (!hasPlan && hasCart) {
+    submitBtn.prop('disabled', false);
+  } else {
+    submitBtn.prop('disabled', true);
+  }
+
+  // Enable when user selects a plan validity
   $(".select-validity").on('change', function() {
-    // Remove highlight from others and add to selected
     $(".select-validity").closest('tr').removeClass('selected-validity');
     $(this).closest('tr').addClass('selected-validity');
 
@@ -160,12 +168,12 @@ $(function() {
     if (discount > 0) total -= (total * discount / 100);
     total += cartTotal;
 
-    // Update display
     $(".totalAmount").text(total.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ","));
     submitBtn.prop('disabled', false);
   });
 });
 </script>
+
 
 <style>
 .selected-validity {
