@@ -1,67 +1,95 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
-
+{% block page_header %}
+<div class="container header-container mt-4 pt-4">
+  <div class="row">
+    <div class="col text-center">
+    </div>
+  </div>
+</div>
+{% endblock %}
 {% block content %}
-<h2>Community Feed</h2>
+<div class="overlay"></div>
+<div class="container py-4 d-flex justify-content-center">
+  <div class="col-lg-6 col-md-8 col-sm-10"> <!-- Central column -->
 
-<a class="btn btn-success mb-3" href="{% url 'community:create_post' %}">Share Success</a>
+    <h2 class="text-center mb-4 fw-bold">Community Feed</h2>
 
-{% for p in posts %}
-<div class="card mb-3">
-    <div class="card-body">
-        <h5>@{{ p.author.username }}</h5>
-        <p>{{ p.body }}</p>
+    <div class="text-center mb-4">
+      <a class="btn btn-success shadow-sm px-4" href="{% url 'community:create_post' %}">
+        <i class="bi bi-pencil-square me-1"></i> Share Your Success
+      </a>
+    </div>
+
+    {% for p in posts %}
+    <div class="card mb-4 shadow-sm rounded-4">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2">
+          <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center me-2" style="width:36px; height:36px;">
+            {{ p.author.username|slice:":1"|upper }}
+          </div>
+          <h6 class="mb-0 fw-bold">@{{ p.author.username }}</h6>
+          <small class="text-muted ms-auto">{{ p.created_at|date:"M d, Y" }}</small>
+        </div>
+
+        <p class="mb-3">{{ p.body }}</p>
 
         {% if p.image %}
-            <img src="{{ p.image.url }}" class="img-fluid rounded mb-2" alt="Post image">
+          <img src="{{ p.image.url }}" class="img-fluid rounded mb-3" alt="Post image">
         {% endif %}
 
         <button 
-            class="btn btn-sm {% if p.liked_by_user %}btn-primary{% else %}btn-outline-primary{% endif %} like-btn"
-            data-id="{{ p.id }}">
-            Like ({{ p.likes.count }})
+          class="btn btn-sm {% if p.liked_by_user %}btn-primary{% else %}btn-outline-primary{% endif %} like-btn"
+          data-id="{{ p.id }}">
+          <i class="bi bi-hand-thumbs-up"></i> Like ({{ p.likes.count }})
         </button>
-    </div>
+      </div>
 
-    <ul class="list-group list-group-flush">
+      <ul class="list-group list-group-flush">
         {% for c in p.comments.all %}
-            <li class="list-group-item">
-                <b>@{{ c.author.username }}</b> {{ c.body }}
-            </li>
+          <li class="list-group-item bg-light">
+            <b>@{{ c.author.username }}</b>: {{ c.body }}
+          </li>
         {% empty %}
-            <li class="list-group-item text-muted">No comments yet</li>
+          <li class="list-group-item text-muted text-center">No comments yet</li>
         {% endfor %}
-    </ul>
+      </ul>
 
-    <div class="card-body">
+      <div class="card-body bg-light">
         <form method="post" action="{% url 'community:add_comment' p.id %}">
-            {% csrf_token %}
-            {{ comment_form|crispy }}
-            <button class="btn btn-outline-secondary mt-2" type="submit">Post</button>
+          {% csrf_token %}
+          {{ comment_form|crispy }}
+          <div class="d-grid">
+            <button type="submit" class="btn btn-outline-secondary mt-2">
+              <i class="bi bi-chat-dots"></i> Post Comment
+            </button>
+          </div>
         </form>
+      </div>
     </div>
+    {% empty %}
+      <p class="text-muted text-center">No posts yet — be the first to share!</p>
+    {% endfor %}
+  </div>
 </div>
-{% empty %}
-<p class="text-muted">No posts yet — be the first to share!</p>
-{% endfor %}
 {% endblock %}
 
 {% block scripts %}
 <script>
 document.querySelectorAll('.like-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
-        const res = await fetch(`/community/${btn.dataset.id}/like/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        });
-        const data = await res.json();
-        btn.textContent = `Like (${data.count})`;
-        btn.classList.toggle('btn-primary', data.liked);
-        btn.classList.toggle('btn-outline-primary', !data.liked);
+  btn.addEventListener('click', async () => {
+    const res = await fetch(`/community/${btn.dataset.id}/like/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
     });
+    const data = await res.json();
+    btn.innerHTML = `<i class="bi bi-hand-thumbs-up"></i> Like (${data.count})`;
+    btn.classList.toggle('btn-primary', data.liked);
+    btn.classList.toggle('btn-outline-primary', !data.liked);
+  });
 });
 </script>
 {% endblock %}

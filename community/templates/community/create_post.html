@@ -1,12 +1,37 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
-
+{% block page_header %}
+<div class="container header-container mt-4 pt-4">
+  <div class="row">
+    <div class="col text-center">
+    </div>
+  </div>
+</div>
+{% endblock %}
 {% block content %}
-<h2>Create a Post</h2>
+<div class="container py-5 d-flex justify-content-center">
+  <div class="col-lg-6 col-md-8 col-sm-10">
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <button type="submit" class="btn btn-primary mt-2">Post</button>
-</form>
+    <div class="card shadow-sm rounded-4 p-4">
+      <h2 class="text-center mb-4 fw-bold text-primary">
+        <i class="bi bi-pencil-square me-2"></i>Create a Post
+      </h2>
+
+      <form method="post" enctype="multipart/form-data" class="needs-validation">
+        {% csrf_token %}
+        {{ form|crispy }}
+
+        <div class="text-center mt-4">
+          <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-sm">
+            <i class="bi bi-upload me-1"></i> Post
+          </button>
+          <a href="{% url 'community:feed' %}" class="btn btn-outline-secondary rounded-pill ms-2">
+            Cancel
+          </a>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
 {% endblock %}
