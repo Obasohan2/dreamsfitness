@@ -1,72 +1,170 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
+
 {% block page_header %}
-<div class="container header-container mt-4 pt-4">
+<div class="container header-container mt-5 pt-5">
   <div class="row">
-    <div class="col text-center">
-    </div>
+    <div class="col text-center"></div>
   </div>
 </div>
 {% endblock %}
+
 {% block content %}
 <div class="overlay"></div>
 <div class="container py-4 d-flex justify-content-center">
-  <div class="col-lg-6 col-md-8 col-sm-10"> <!-- Central column -->
+  <div class="col-lg-6 col-md-8 col-sm-10">
 
     <h2 class="text-center mb-4 fw-bold">Community Feed</h2>
 
+    <!-- ✅ Share button -->
     <div class="text-center mb-4">
-      <a class="btn btn-success shadow-sm px-4" href="{% url 'community:create_post' %}">
-        <i class="bi bi-pencil-square me-1"></i> Share Your Success
-      </a>
+      {% if user.is_authenticated %}
+        <a class="btn btn-success shadow-sm px-4" href="{% url 'community:create_post' %}">
+          <i class="bi bi-pencil-square me-1"></i> Share Your Success
+        </a>
+      {% else %}
+        <a class="btn btn-outline-secondary shadow-sm px-4" href="{% url 'login' %}">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Log in to Share
+        </a>
+      {% endif %}
     </div>
 
     {% for p in posts %}
     <div class="card mb-4 shadow-sm rounded-4">
       <div class="card-body">
+
+        <!-- 👤 Post Header -->
         <div class="d-flex align-items-center mb-2">
-          <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center me-2" style="width:36px; height:36px;">
+          <div class="rounded-circle bg-primary text-white d-flex justify-content-center align-items-center me-2"
+               style="width:36px; height:36px;">
             {{ p.author.username|slice:":1"|upper }}
           </div>
           <h6 class="mb-0 fw-bold">@{{ p.author.username }}</h6>
-          <small class="text-muted ms-auto">{{ p.created_at|date:"M d, Y" }}</small>
+          <small class="text-muted ms-auto">{{ p.created_at|date:"M d, Y, g:i A" }}</small>
+
+          <!-- 🗑️ Delete Post (owner or admin) -->
+          {% if user.is_authenticated %}
+            {% if user == p.author or user.is_superuser %}
+              <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2 ms-2"
+                      data-bs-toggle="modal" data-bs-target="#deletePostModal{{ p.id }}"
+                      title="Delete Post">
+                <i class="bi bi-trash"></i>
+              </button>
+            {% endif %}
+          {% endif %}
         </div>
 
+        <!-- 📝 Post body -->
         <p class="mb-3">{{ p.body }}</p>
 
         {% if p.image %}
-          <img src="{{ p.image.url }}" class="img-fluid rounded mb-3" alt="Post image">
+          <img src="{{ p.image.url }}" class="img-fluid rounded mb-3" alt="Post by {{ p.author.username }}">
         {% endif %}
 
-        <button 
-          class="btn btn-sm {% if p.liked_by_user %}btn-primary{% else %}btn-outline-primary{% endif %} like-btn"
-          data-id="{{ p.id }}">
-          <i class="bi bi-hand-thumbs-up"></i> Like ({{ p.likes.count }})
-        </button>
+        <!-- ❤️ Like button -->
+        <div class="d-flex align-items-center">
+          {% if user.is_authenticated %}
+            <button class="btn btn-like shadow-none border-0 p-0 bg-transparent" data-id="{{ p.id }}">
+              {% if p.liked_by_user %}
+                <i class="bi bi-heart-fill text-danger fs-4"></i>
+              {% else %}
+                <i class="bi bi-heart text-dark fs-4"></i>
+              {% endif %}
+            </button>
+          {% else %}
+            <i class="bi bi-heart text-muted fs-4"></i>
+          {% endif %}
+          <span class="ms-2 text-muted like-count">{{ p.likes.count }}</span>
+        </div>
       </div>
 
+      <!-- 💬 Comments -->
       <ul class="list-group list-group-flush">
         {% for c in p.comments.all %}
-          <li class="list-group-item bg-light">
-            <b>@{{ c.author.username }}</b>: {{ c.body }}
+          <li class="list-group-item bg-light d-flex justify-content-between align-items-center">
+            <div>
+              <b>@{{ c.author.username }}</b>: {{ c.body }}
+            </div>
+            {% if user.is_authenticated %}
+              {% if user == c.author or user.is_superuser %}
+                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2"
+                        data-bs-toggle="modal" data-bs-target="#deleteCommentModal{{ c.id }}"
+                        title="Delete Comment">
+                  <i class="bi bi-trash"></i>
+                </button>
+              {% endif %}
+            {% endif %}
           </li>
         {% empty %}
           <li class="list-group-item text-muted text-center">No comments yet</li>
         {% endfor %}
       </ul>
 
+      <!-- 💬 Comment form -->
       <div class="card-body bg-light">
-        <form method="post" action="{% url 'community:add_comment' p.id %}">
-          {% csrf_token %}
-          {{ comment_form|crispy }}
-          <div class="d-grid">
-            <button type="submit" class="btn btn-outline-secondary mt-2">
-              <i class="bi bi-chat-dots"></i> Post Comment
-            </button>
-          </div>
-        </form>
+        {% if user.is_authenticated %}
+          <form method="post" action="{% url 'community:add_comment' p.id %}">
+            {% csrf_token %}
+            {{ comment_form|crispy }}
+            <div class="d-grid">
+              <button type="submit" class="btn btn-outline-secondary mt-2">
+                <i class="bi bi-chat-dots"></i> Post Comment
+              </button>
+            </div>
+          </form>
+        {% else %}
+          <p class="text-center text-muted mb-0">
+            <a href="{% url 'login' %}">Log in</a> to post a comment.
+          </p>
+        {% endif %}
       </div>
     </div>
+
+    <!-- 🧩 Delete Post Modal -->
+    <div class="modal fade" id="deletePostModal{{ p.id }}" tabindex="-1" aria-labelledby="deletePostModalLabel{{ p.id }}" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-header border-0">
+            <h5 class="modal-title fw-bold">Delete Post</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to delete this post? This action cannot be undone.
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <form method="post" action="{% url 'community:delete_post' p.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% for c in p.comments.all %}
+    <!-- 🧩 Delete Comment Modal -->
+    <div class="modal fade" id="deleteCommentModal{{ c.id }}" tabindex="-1" aria-labelledby="deleteCommentModalLabel{{ c.id }}" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 shadow">
+          <div class="modal-header border-0">
+            <h5 class="modal-title fw-bold">Delete Comment</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Are you sure you want to delete this comment?
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <form method="post" action="{% url 'community:delete_comment' c.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
     {% empty %}
       <p class="text-muted text-center">No posts yet — be the first to share!</p>
     {% endfor %}
@@ -75,8 +173,9 @@
 {% endblock %}
 
 {% block scripts %}
+{% if user.is_authenticated %}
 <script>
-document.querySelectorAll('.like-btn').forEach(btn => {
+document.querySelectorAll('.btn-like').forEach(btn => {
   btn.addEventListener('click', async () => {
     const res = await fetch(`/community/${btn.dataset.id}/like/`, {
       method: 'POST',
@@ -85,11 +184,42 @@ document.querySelectorAll('.like-btn').forEach(btn => {
         'X-Requested-With': 'XMLHttpRequest'
       }
     });
+
+    if (res.status === 401) {
+      const data = await res.json();
+      window.location.href = data.redirect;
+      return;
+    }
+
     const data = await res.json();
-    btn.innerHTML = `<i class="bi bi-hand-thumbs-up"></i> Like (${data.count})`;
-    btn.classList.toggle('btn-primary', data.liked);
-    btn.classList.toggle('btn-outline-primary', !data.liked);
+    const icon = btn.querySelector('i');
+    const count = btn.nextElementSibling;
+
+    if (data.liked) {
+      icon.classList.replace('bi-heart', 'bi-heart-fill');
+      icon.classList.add('text-danger');
+      icon.classList.remove('text-dark');
+    } else {
+      icon.classList.replace('bi-heart-fill', 'bi-heart');
+      icon.classList.add('text-dark');
+      icon.classList.remove('text-danger');
+    }
+
+    count.textContent = data.count;
+    icon.style.transform = 'scale(1.3)';
+    setTimeout(() => icon.style.transform = 'scale(1)', 200);
   });
 });
 </script>
+{% else %}
+<script>
+document.querySelectorAll('.bi-heart').forEach(icon => {
+  icon.addEventListener('click', () => {
+    if (confirm("You need to log in to like posts. Go to login page?")) {
+      window.location.href = "{% url 'login' %}?next={{ request.path }}";
+    }
+  });
+});
+</script>
+{% endif %}
 {% endblock %}
