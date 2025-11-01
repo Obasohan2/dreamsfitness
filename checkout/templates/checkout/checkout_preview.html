@@ -15,7 +15,8 @@
 
     <div class="table-responsive shadow-sm">
       <table class="table table-bordered align-middle">
-        <!-- Plan Details Section -->
+
+        <!-- ================== Plan Details Section ================== -->
         {% if plan %}
         <thead class="table-warning">
           <tr>
@@ -58,24 +59,24 @@
             <td>
               <table class="table table-bordered mb-0">
                 {% for discount in plan.plandiscount_set.all %}
-                <tr>
-                  <td>
-                    <input 
-                      type="radio" 
-                      id="validity{{ discount.id }}" 
-                      name="validity" 
-                      class="select-validity" 
-                      data-planprice="{{ plan.price }}" 
-                      data-discount="{{ discount.total_discount }}" 
-                      value="{{ discount.total_months }}">
-                  </td>
-                  <th>
-                    <label for="validity{{ discount.id }}">{{ discount.total_months }} Month</label>
-                  </th>
-                  <td>{{ discount.total_discount }}%</td>
-                </tr>
+                  <tr>
+                    <td>
+                      <input 
+                        type="radio" 
+                        id="validity{{ discount.id }}" 
+                        name="validity" 
+                        class="select-validity" 
+                        data-planprice="{{ plan.price }}" 
+                        data-discount="{{ discount.total_discount }}" 
+                        value="{{ discount.total_months }}">
+                    </td>
+                    <th>
+                      <label for="validity{{ discount.id }}">{{ discount.total_months }} Month</label>
+                    </th>
+                    <td>{{ discount.total_discount }}%</td>
+                  </tr>
                 {% empty %}
-                <tr><td colspan="3" class="text-muted text-center">No discounts available</td></tr>
+                  <tr><td colspan="3" class="text-muted text-center">No discounts available</td></tr>
                 {% endfor %}
               </table>
             </td>
@@ -83,12 +84,10 @@
         </tbody>
         {% endif %}
 
-        <!-- Cart Items Section -->
+        <!-- ================== Cart Items Section ================== -->
         {% if cart and cart|length > 0 %}
         <thead class="table-secondary">
-          <tr>
-            <th colspan="3" class="text-center">Products in Your Cart</th>
-          </tr>
+          <tr><th colspan="3" class="text-center">Products in Your Cart</th></tr>
         </thead>
         <tbody>
           {% for item in cart %}
@@ -100,16 +99,17 @@
         </tbody>
         {% endif %}
 
-        <!-- Totals -->
+        <!-- ================== Totals ================== -->
         <tfoot class="table-light">
           {% if plan %}
-          <tr><th colspan="2">Plan Subtotal</th><td>£{{ plan.price|floatformat:2 }}</td></tr>
+            <tr><th colspan="2">Plan Subtotal</th><td>£{{ plan.price|floatformat:2 }}</td></tr>
           {% endif %}
           {% if cart and cart|length > 0 %}
-          <tr><th colspan="2">Cart Subtotal</th><td>£{{ cart.get_total_price|default:0|floatformat:2 }}</td></tr>
+            <tr><th colspan="2">Cart Subtotal</th><td>£{{ cart.get_total_price|default:0|floatformat:2 }}</td></tr>
           {% endif %}
         </tfoot>
 
+        <!-- ================== Checkout Section ================== -->
         <tfoot class="table-info">
           <tr>
             <td></td>
@@ -119,22 +119,27 @@
           <tr>
             <td colspan="2"></td>
             <td>
-              <form method="post" action="{% url 'checkout_session' %}">
-                {% csrf_token %}
-                {% if plan %}
-                <input type="hidden" name="plan_id" value="{{ plan.id }}">
-                {% endif %}
-                {% if is_full %}
-                  <button type="button" class="btn btn-secondary w-100" disabled>
-                    Plan Full — Seats Unavailable
-                  </button>
-                {% else %}
-                {% if not user.is_authenticated %}
-                 <div class="alert alert-info text-center mt-4">
+              {% if not user.is_authenticated %}
+                <!-- Guest message -->
+                <div class="alert alert-info text-center mt-2 mb-0">
                   Please <a href="{% url 'login' %}?next={{ request.path }}" class="fw-bold">log in</a> to complete your checkout.
-                  </div>
+                </div>
+              {% else %}
+                <!-- Authenticated checkout form -->
+                <form method="post" action="{% url 'checkout_session' %}">
+                  {% csrf_token %}
+                  {% if plan %}
+                    <input type="hidden" name="plan_id" value="{{ plan.id }}">
                   {% endif %}
-              </form>
+                  {% if is_full %}
+                    <button type="button" class="btn btn-secondary w-100" disabled>
+                      Plan Full — Seats Unavailable
+                    </button>
+                  {% else %}
+                    <input type="submit" value="Proceed to Payment" class="btn btn-primary w-100" disabled>
+                  {% endif %}
+                </form>
+              {% endif %}
             </td>
           </tr>
         </tfoot>
@@ -150,14 +155,14 @@ $(function() {
   const hasPlan = {{ plan|yesno:"true,false" }};
   const hasCart = {{ cart|length|yesno:"true,false" }};
 
-  // Enable submit if no plan but there are products in cart
+  // Enable submit if there’s no plan but items exist in cart
   if (!hasPlan && hasCart) {
     submitBtn.prop('disabled', false);
   } else {
     submitBtn.prop('disabled', true);
   }
 
-  // Enable when user selects a plan validity
+  // Enable when user selects plan validity
   $(".select-validity").on('change', function() {
     $(".select-validity").closest('tr').removeClass('selected-validity');
     $(this).closest('tr').addClass('selected-validity');
@@ -177,16 +182,9 @@ $(function() {
 });
 </script>
 
-
 <style>
-.selected-validity {
-  background-color: #fff3cd !important;
-}
-.table thead th {
-  background-color: #fef6d8;
-}
-.table tfoot th, .table tfoot td {
-  vertical-align: middle;
-}
+.selected-validity { background-color: #fff3cd !important; }
+.table thead th { background-color: #fef6d8; }
+.table tfoot th, .table tfoot td { vertical-align: middle; }
 </style>
 {% endblock %}

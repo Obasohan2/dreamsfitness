@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'accounts.apps.AccountsConfig',
     'home',
     'products.apps.ProductsConfig',
-    'cart',
+    'cart.apps.CartConfig',
     'checkout.apps.CheckoutConfig',
     'subscriptions.apps.SubscriptionsConfig',
     'community',
@@ -70,6 +70,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',  # django-allauth middleware
+    'cart.middleware.PreserveCartMiddleware', # custom cart middleware
 ]
 
 ROOT_URLCONF = 'dreamsprj.urls'
