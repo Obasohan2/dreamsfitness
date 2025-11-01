@@ -29,5 +29,6 @@ urlpatterns = [
     path('subscriptions/', include('subscriptions.urls')),
     path('', include('home.urls')),
     path('checkout/', include('checkout.urls')),
+    path('community/', include(('community.urls', 'community'), namespace='community')),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -21,8 +21,8 @@ def signup_view(request):
             user = form.save()
             # Automatically create a profile for this user
             Profile.objects.get_or_create(user=user)
-            login(request, user)
-            messages.success(request, "🎉 Account created successfully!")
+            login(request, user, backend='allauth.account.auth_backends.AuthenticationBackend')
+            messages.success(request, "Account created successfully!")
             return redirect('profile')
         else:
             messages.error(request, "Please correct the errors below.")
@@ -42,11 +42,10 @@ def login_view(request):
                 password=form.cleaned_data['password']
             )
             if user is not None:
-                # Ensure profile exists (important fix)
                 Profile.objects.get_or_create(user=user)
-                login(request, user)
-                messages.success(request, f"Welcome back, {user.username} 👋")
-                return redirect('profile')
+                login(request, user, backend='allauth.account.auth_backends.AuthenticationBackend')
+                messages.success(request, f"Welcome back, {user.username}!")
+                return redirect('home')
         messages.error(request, "Invalid username or password.")
     else:
         form = LoginForm()
@@ -55,7 +54,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    messages.info(request, "👋 Logged out successfully.")
+    messages.info(request, "Logged out successfully.")
     return redirect('login')
 
 
@@ -70,7 +69,7 @@ def profile_view(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            messages.success(request, "✅ Your profile has been updated successfully.")
+            messages.success(request, "Your profile has been updated successfully.")
             return redirect('profile')
         else:
             messages.error(request, "Please correct the errors below.")
@@ -92,7 +91,7 @@ def change_password_view(request):
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
-            messages.success(request, "🔒 Your password has been changed successfully.")
+            messages.success(request, "Your password has been changed successfully.")
             return redirect('profile')
         else:
             messages.error(request, "Please correct the errors below.")

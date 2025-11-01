@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h2>Community Feed</h2>
+
+<a class="btn btn-success mb-3" href="{% url 'community:create_post' %}">Share Success</a>
+
+{% for p in posts %}
+<div class="card mb-3">
+    <div class="card-body">
+        <h5>@{{ p.author.username }}</h5>
+        <p>{{ p.body }}</p>
+
+        {% if p.image %}
+            <img src="{{ p.image.url }}" class="img-fluid rounded mb-2" alt="Post image">
+        {% endif %}
+
+        <button 
+            class="btn btn-sm {% if p.liked_by_user %}btn-primary{% else %}btn-outline-primary{% endif %} like-btn"
+            data-id="{{ p.id }}">
+            Like ({{ p.likes.count }})
+        </button>
+    </div>
+
+    <ul class="list-group list-group-flush">
+        {% for c in p.comments.all %}
+            <li class="list-group-item">
+                <b>@{{ c.author.username }}</b> {{ c.body }}
+            </li>
+        {% empty %}
+            <li class="list-group-item text-muted">No comments yet</li>
+        {% endfor %}
+    </ul>
+
+    <div class="card-body">
+        <form method="post" action="{% url 'community:add_comment' p.id %}">
+            {% csrf_token %}
+            {{ comment_form|crispy }}
+            <button class="btn btn-outline-secondary mt-2" type="submit">Post</button>
+        </form>
+    </div>
+</div>
+{% empty %}
+<p class="text-muted">No posts yet — be the first to share!</p>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const res = await fetch(`/community/${btn.dataset.id}/like/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        const data = await res.json();
+        btn.textContent = `Like (${data.count})`;
+        btn.classList.toggle('btn-primary', data.liked);
+        btn.classList.toggle('btn-outline-primary', !data.liked);
+    });
+});
+</script>
+{% endblock %}

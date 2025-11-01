@@ -21,13 +21,10 @@ def update_plan_members_on_payment(sender, instance, created, **kwargs):
     # If an existing order’s status changes to paid
     elif not created:
         # Get the previous version from the database
-        previous = sender.objects.filter(id=instance.id).first()
-        if previous and previous.status != "paid" and instance.status == "paid":
-            plan.total_members += 1
-            plan.save()
-
-    # If the order is cancelled or failed, reduce the count
-    elif instance.status in ["cancelled", "failed"]:
-        if plan.total_members > 0:
-            plan.total_members -= 1
+        previous = sender.objects.get(id=instance.id)
+        if previous.status != instance.status:
+            if instance.status == "paid":
+                plan.total_members += 1
+            elif instance.status in ["cancelled", "failed"] and plan.total_members > 0:
+                plan.total_members -= 1
             plan.save()

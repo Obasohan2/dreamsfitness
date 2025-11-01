@@ -17,7 +17,7 @@
 
         <!-- Community -->
         <li class="nav-item">
-            <a class="logo-font font-weight-bold nav-link text-black mr-5" href="#">
+            <a class="logo-font font-weight-bold nav-link text-black mr-5" href="{% url 'community:feed' %}">
                 Community
             </a>
         </li>
@@ -28,18 +28,4 @@
                 Subscriptions Rates
             </a>
         </li>
-
-        <!-- Workout Plans Dropdown -->
-        <li class="nav-item dropdown">
-            <a class="logo-font font-weight-bold nav-link text-black mr-5 dropdown-toggle"
-               href="#" id="workout-plans-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Workout Plans
-            </a>
-            <div class="dropdown-menu border-0" aria-labelledby="workout-plans-link">
-                <a href="/shop/?category=exercise" class="dropdown-item">Exercise Plan</a>
-                <a href="/shop/?category=nutrition" class="dropdown-item">Nutrition Plan</a>
-            </div>
-        </li>
-
-    </ul>
 </div>
