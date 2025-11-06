@@ -1,38 +1,41 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
-class SubPlan(models.Model):  # Subscription plans
+class SubPlan(models.Model):
     title = models.CharField(max_length=150)
-    price = models.IntegerField()
-    max_member = models.IntegerField(null=True, blank=True)
-    total_members = models.PositiveIntegerField(default=0)  # Track total members
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    max_member = models.IntegerField(null=True)
     highlight_status = models.BooleanField(default=False, null=True)
-    validity_days = models.IntegerField(null=True, blank=True)
+    validity_days = models.IntegerField(null=True)
 
     def __str__(self):
         return self.title
 
 
-class PlanDiscount(models.Model):  # Discounts based on duration
+class SubPlanFeature(models.Model):
+    subplan = models.ManyToManyField(SubPlan)
+    title = models.CharField(max_length=150)
+
+    def __str__(self):
+        return self.title
+
+
+class PlanDiscount(models.Model):
     subplan = models.ForeignKey(SubPlan, on_delete=models.CASCADE, null=True)
     total_months = models.IntegerField()
     total_discount = models.IntegerField()
 
     def __str__(self):
-        return f"{self.total_months} months - {self.total_discount}% off"
+        return str(self.total_months)
 
 
-class SubPlanFeature(models.Model):  # Features for subscription plans
-    subplan = models.ManyToManyField(SubPlan)
-    title = models.CharField(max_length=150)
-
-    def __str__(self):
-        return self.title
-
-
-class DynamicFeature(models.Model):  # Dynamic (add-on) features for plans
-    title = models.CharField(max_length=100)
-    subplan = models.ManyToManyField(SubPlan)
+class UserSubscription(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    plan = models.ForeignKey(SubPlan, on_delete=models.CASCADE, related_name='subscriptions')
+    start_date = models.DateField(auto_now_add=True)
+    end_date = models.DateField(null=True, blank=True)
+    active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.title
+        return f"{self.user.username} - {self.plan.title}"

@@ -1,12 +1,17 @@
-html {
-	height: 100%;
-}
 
 body {
 	background: url('/media/gym1.jpg') no-repeat center center fixed;
 	background-size: cover;
 	height: calc(100vh - 164px);
-	color: #555 font-family: 'Lato';
+	color: #555;
+	font-family: 'Lato', sans-serif;
+	padding-top: 56px;
+	height: 100%;
+}
+
+main {
+  /* Give enough space for header + red banner */
+  margin-top: 200px !important;
 }
 
 /* from Bulma */
@@ -41,6 +46,14 @@ body {
 .nav-item .badge {
     font-size: 0.7rem;
     padding: 0.3em 0.45em;
+}
+
+.messages {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  width: 100%;
+  z-index: 1050;
 }
 
 .shop-now-button:hover,
@@ -240,11 +253,18 @@ input[disabled] {
         right: 0;
         left: 0;
         z-index: 1030;
+		main {
+			margin-top: 220px !important;
+		}
     }
 
     .header-container {
         padding-top: 164px;
     }
+}
+
+main > .container {
+  padding-top: 10px;
 }
 
 /* pad the top a bit when navbar is collapsed on mobile */
@@ -258,6 +278,41 @@ input[disabled] {
     }
 }
 
+
+
+/* === Back to Top Button (bottom-left corner) === */
+.back-to-top {
+  position: fixed;
+  bottom: 25px;
+  left: 25px;
+  z-index: 1050;
+  display: none; /* Hidden until user scrolls */
+  font-size: 0.9rem;
+  border-radius: 30px;
+  padding: 8px 16px;
+  background-color: #f8f9fa;
+  color: #3f0303;
+  border: 1px solid #ccc;
+  text-decoration: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transition: opacity 0.4s ease, background-color 0.3s ease;
+}
+
+.back-to-top:hover {
+  background-color: #5e1006;
+  color: #570404;
+  border-color: #470606;
+}
+
+@media (max-width: 768px) {
+  .back-to-top {
+    bottom: 15px;
+    left: 15px;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+  }
+}
 
 
 

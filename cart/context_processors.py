@@ -1,24 +1,23 @@
-from decimal import Decimal
-from .cart import Cart
+from .models import Cart
 
 
-def cart_contents(request):
-    """
-    Make cart data available in all templates.
-    """
-    cart = Cart(request)
-    cart_items = list(cart)
-    total_price = cart.get_total_price()
-    cart_count = len(cart)
+def cart_context(request):
+    """Makes cart data available globally — for both users and guests."""
+    cart_count = 0
+    grand_total = 0
 
-    delivery = Decimal('0.00')
-    grand_total = total_price + delivery
+    # Only fetch cart if session or user exists
+    if request.user.is_authenticated:
+        cart = Cart.objects.filter(user=request.user).first()
+    else:
+        cart_id = request.session.get('cart_id')
+        cart = Cart.objects.filter(id=cart_id, user=None).first() if cart_id else None
 
-    context = {
-        'cart_items': cart_items,
+    if cart:
+        cart_count = cart.total_items()
+        grand_total = cart.total_price()
+
+    return {
         'cart_count': cart_count,
-        'total_price': total_price,
-        'delivery': delivery,
         'grand_total': grand_total,
     }
-    return context

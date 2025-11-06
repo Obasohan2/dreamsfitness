@@ -8,6 +8,11 @@ from django.db.models import Avg, Count
 
 
 def all_products(request):
+    products = Product.objects.all()
+    return render(request, 'products/products.html', {'products': products})
+
+
+def all_products(request):
     """
     Display all available products with sorting, category filtering, and search.
     """

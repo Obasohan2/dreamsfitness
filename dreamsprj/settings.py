@@ -53,8 +53,9 @@ INSTALLED_APPS = [
     'products.apps.ProductsConfig',
     'cart.apps.CartConfig',
     'checkout.apps.CheckoutConfig',
-    'subscriptions.apps.SubscriptionsConfig',
     'community',
+    'subscriptions',
+
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
@@ -70,7 +71,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',  # django-allauth middleware
-    'cart.middleware.PreserveCartMiddleware', # custom cart middleware
+    'cart.middleware.PreserveCartMiddleware',  # custom cart middleware
 ]
 
 ROOT_URLCONF = 'dreamsprj.urls'
@@ -87,9 +88,9 @@ TEMPLATES = [
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',  # required by allauth
-                'django.contrib.auth.context_processors.auth',
-                'cart.context_processors.cart_contents',  # custom cart context processor
+                'django.contrib.auth.context_processors.auth', 
                 'django.contrib.messages.context_processors.messages',
+                'cart.context_processors.cart_context',  # custom cart context processor
             ],
         },
     },

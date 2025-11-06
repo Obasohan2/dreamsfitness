@@ -19,6 +19,8 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from subscriptions import views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,9 +28,9 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('shop/', include(('products.urls', 'products'), namespace='products')),
     path('cart/', include('cart.urls', namespace='cart')),
-    path('subscriptions/', include('subscriptions.urls')),
     path('', include('home.urls')),
-    path('checkout/', include('checkout.urls')),
+    path('subscriptions/', include('subscriptions.urls')),
+    path('checkout/<int:plan_id>/', views.checkout, name='checkout'),
     path('community/', include(('community.urls', 'community'), namespace='community')),
-
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

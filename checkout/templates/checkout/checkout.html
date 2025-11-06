@@ -1,142 +1,170 @@
 {% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+{% endblock %}
+
 {% block page_header %}
-<div class="container header-container mt-4 pt-4">
-  <div class="row">
-    <div class="col text-center">
+<div class="container header-container">
+    <div class="row">
+        <div class="col text-center"></div>
     </div>
-  </div>
+</div>
+{% endblock %}
+
 {% block content %}
 <div class="overlay"></div>
 <main>
-  <section class="container my-5">
-    <h1 class="text-center mb-4 border-bottom pb-2">Checkout</h1>
+    <section class="container my-2">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h1 class="section-heading border-bottom pb-2 d-inline-block mb-0">Checkout</h1>
+        </div>
 
-    <div class="table-responsive shadow-sm">
-      <table class="table table-bordered align-middle">
-        <thead class="table-warning">
-          <tr>
-            <th>Plan</th>
-            <th>Plan Detail</th>
-            <th>Payment For</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% if plan %}
-          <tr>
-            <td>
-              <table class="table table-bordered mb-0">
-                <tr><th>Name</th><td>{{ plan.title }}</td></tr>
-                <tr><th>Price</th><td>£{{ plan.price }}</td></tr>
-                <tr><th>Max Member</th><td>{{ plan.max_member|default:30 }}</td></tr>
-                <tr><th>Already Registered</th><td>{{ plan.total_members|default:0 }}</td></tr>
+        <!-- Progress Bar -->
+        <div class="checkout-steps mb-5">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0;"></div>
+                </div>
+                <div class="progress-labels d-flex justify-content-between mt-2">
+                    <span class="step done">1. Select Plan</span>
+                    <span class="step active">2. Checkout</span>
+                    <span class="step">3. Payment Confirmation</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Plan Table -->
+        <table class="table table-bordered">
+            <thead class="table-warning">
                 <tr>
-                    <th>Balance Seats</th>
+                    <th>Plan</th>
+                    <th>Plan Detail</th>
+                    <th>Payment For</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
                     <td>
-                        {% if balance_seats > 0 %}
-                        {{ balance_seats }}
-                        {% else %}
-                        <span class="text-danger fw-bold">Full</span>
-                        {% endif %}
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>Name</th>
+                                <td>{{ plan.title }}</td>
+                            </tr>
+                            <tr>
+                                <th>Price</th>
+                                <td>£{{ plan.price }}</td>
+                            </tr>
+                            <tr>
+                                <th>Max Member</th>
+                                <td>30</td>
+                            </tr>
+                            <tr>
+                                <th>Already Registered</th>
+                                <td>15</td>
+                            </tr>
+                            <tr>
+                                <th>Balance Seats</th>
+                                <td>15</td>
+                            </tr>
+                        </table>
+                    </td>
+
+                    <td>
+                        <ul class="list-unstyled">
+                            {% for feature in plan.subplanfeature_set.all %}
+                                <li>{{ feature.title }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+
+                    <td>
+                        <table class="table table-bordered">
+                            {% for discount in plan.plandiscount_set.all %}
+                                <tr>
+                                    <td>
+                                        <input 
+                                            type="radio" 
+                                            id="validity{{ discount.id }}" 
+                                            name="validity" 
+                                            class="select-validity"
+                                            value="{{ discount.total_months }}"
+                                            data-planprice="{{ plan.price }}" 
+                                            data-discount="{{ discount.total_discount }}" 
+                                        />
+                                    </td>
+                                    <th>
+                                        <label for="validity{{ discount.id }}">
+                                            {{ discount.total_months }} Month
+                                        </label>
+                                    </th>
+                                    <td>{{ discount.total_discount }}%</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
                     </td>
                 </tr>
-              </table>
-            </td>
-            <td>
-              <ul class="list-unstyled mb-0">
-                {% for feature in plan.subplanfeature_set.all %}
-                  <li><i class="bi bi-check-circle text-success"></i> {{ feature.title }}</li>
-                {% empty %}
-                  <li class="text-muted">No features listed</li>
-                {% endfor %}
-              </ul>
-            </td>
-            <td>
-              <table class="table table-bordered mb-0">
-                {% for discount in plan.plandiscount_set.all %}
-                  <tr>
-                    <td>
-                      <input data-planprice="{{ plan.price }}" 
-                             data-discount="{{ discount.total_discount }}" 
-                             type="radio" 
-                             id="validity{{ discount.id }}" 
-                             name="validity" 
-                             class="select-validity" 
-                             value="{{ discount.total_months }}">
+            </tbody>
+
+            <tfoot class="table-info text-center">
+                <tr>
+                    <td></td>
+                    <th>Total Amount</th>
+                    <td><b>£<span class="totalAmount">{{ plan.price }}</span></b></td>
+                </tr>
+                <tr>
+                    <td colspan="3" class="text-center">
+                        <div class="d-flex flex-column flex-md-row justify-content-center align-items-center gap-3">
+                            <a href="{% url 'pricing' %}" class="btn btn-outline-secondary w-auto px-4 py-2">
+                                ← Back to Plans
+                            </a>
+                            <form method="post" action="#" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary w-auto px-4 py-2">
+                                    <i class="bi bi-lock-fill me-1"></i> Secured Checkout
+                                </button>
+                            </form>
+                        </div>
                     </td>
-                    <th><label for="validity{{ discount.id }}">{{ discount.total_months }} Month</label></th>
-                    <td>{{ discount.total_discount }}%</td>
-                  </tr>
-                {% empty %}
-                  <tr><td colspan="3" class="text-muted text-center">No discounts available</td></tr>
-                {% endfor %}
-              </table>
-            </td>
-          </tr>
-          {% endif %}
-        </tbody>
-
-        <!-- Cart Items Section -->
-        {% if cart and cart|length > 0 %}
-        <thead class="table-secondary">
-          <tr>
-            <th colspan="3" class="text-center">Products in Your Cart</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in cart %}
-          <tr>
-            <td colspan="2">{{ item.product.title }}</td>
-            <td>£{{ item.total_price }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-        {% endif %}
-
-        <tfoot class="table-info">
-          <tr>
-            <td></td>
-            <th>Total Amount</th>
-            <td><b>£<span class="totalAmount">{{ total_price }}</span></b></td>
-          </tr>
-          <tr>
-            <td colspan="2"></td>
-            <td>
-              <form method="post" action="{% url 'checkout_session' %}">
-                {% csrf_token %}
-                {% if plan %}
-                <input type="hidden" name="plan_id" value="{{ plan.id }}">
-                {% endif %}
-                {% if is_full %}
-                <button type="button" class="btn btn-secondary w-100" disabled>
-                    Plan Full — Seats Unavailable
-                </button>
-                {% else %}
-                <input type="submit" value="Proceed to Payment / Secured Checkout" class="btn btn-primary w-100">
-                {% endif %}
-              </form>
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  </section>
+                </tr>
+            </tfoot>
+        </table>
+    </section>
 </main>
 
+{% block postloadjs %}
+{{ block.super }}
 <script>
-$(function() {
-  $(".select-validity").on('click', function() {
-    const planPrice = parseFloat($(this).data('planprice'));
-    const months = parseInt($(this).val());
-    const discount = parseFloat($(this).data('discount'));
-    let total = planPrice * months;
-    if (discount > 0) total -= total * discount / 100;
+    // Animate progress bar
+    document.addEventListener("DOMContentLoaded", function() {
+        const progressFill = document.querySelector('.progress-fill');
+        if (progressFill) {
+            setTimeout(() => {
+                progressFill.style.width = '66%';
+            }, 300);
+        }
+    });
 
-    // Add cart total to plan total
-    const cartTotal = parseFloat('{{ cart.get_total_price|default:0 }}');
-    total += cartTotal;
+    // Dynamic total amount calculation
+    $(function() {
+        $(".select-validity").on("click", function() {
+            const planPrice = parseFloat($(this).data("planprice")) || 0;
+            const planMonths = parseInt($(this).val()) || 1;
+            const planDiscount = parseFloat($(this).data("discount")) || 0;
 
-    $(".totalAmount").text(total.toFixed(2));
-  });
-});
+            let totalPrice = planPrice * planMonths;
+            let finalPrice = totalPrice;
+
+            if (planDiscount > 0) {
+                const discountAmount = (totalPrice * planDiscount) / 100;
+                finalPrice = totalPrice - discountAmount;
+            }
+
+            $(".totalAmount").text(finalPrice.toFixed(2));
+        });
+    });
 </script>
+{% endblock %}
 {% endblock %}

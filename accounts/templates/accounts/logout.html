@@ -21,3 +21,15 @@
   </div>
 </div>
 {% endblock %}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+      setTimeout(() => {
+        const bsAlert = new bootstrap.Alert(alert);
+        bsAlert.close(); // fade out and remove
+      }, 3000); // 3 seconds
+    });
+  });
+</script>

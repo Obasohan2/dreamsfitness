@@ -21,7 +21,10 @@ def signup_view(request):
             user = form.save()
             # Automatically create a profile for this user
             Profile.objects.get_or_create(user=user)
-            login(request, user, backend='allauth.account.auth_backends.AuthenticationBackend')
+            
+            # Simplified login (no need for backend arg)
+            login(request, user)
+            
             messages.success(request, "Account created successfully!")
             return redirect('profile')
         else:
@@ -34,6 +37,10 @@ def signup_view(request):
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('profile')
+
+    # Optional: Support ?next=/somewhere/
+    next_url = request.GET.get('next', 'home')
+
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
         if form.is_valid():
@@ -43,9 +50,12 @@ def login_view(request):
             )
             if user is not None:
                 Profile.objects.get_or_create(user=user)
-                login(request, user, backend='allauth.account.auth_backends.AuthenticationBackend')
+                
+                # Simplified login (authenticate already sets backend)
+                login(request, user)
+                
                 messages.success(request, f"Welcome back, {user.username}!")
-                return redirect('home')
+                return redirect(next_url)
         messages.error(request, "Invalid username or password.")
     else:
         form = LoginForm()
@@ -65,7 +75,9 @@ def profile_view(request):
 
     if request.method == 'POST':
         user_form = UserUpdateForm(request.POST, instance=request.user)
-        profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        profile_form = ProfileUpdateForm(
+            request.POST, request.FILES, instance=request.user.profile
+        )
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()

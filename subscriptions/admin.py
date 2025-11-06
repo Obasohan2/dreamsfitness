@@ -1,37 +1,22 @@
 from django.contrib import admin
-from .models import SubPlan, SubPlanFeature, PlanDiscount, DynamicFeature
+from . import models
 
 
-@admin.register(SubPlan)
+@admin.register(models.SubPlan)
 class SubPlanAdmin(admin.ModelAdmin):
-    list_display = ('title', 'price', 'max_member', 'total_members', 'validity_days', 'highlight_status')
     list_editable = ('highlight_status', 'max_member')
-    search_fields = ('title',)
-    list_filter = ('highlight_status', 'validity_days')
-    ordering = ('price',)
-    readonly_fields = ('total_members',)  # Optional: protect member count from edits
+    list_display = ('title', 'price', 'max_member', 'validity_days', 'highlight_status')
 
 
-@admin.register(SubPlanFeature)
+@admin.register(models.SubPlanFeature)
 class SubPlanFeatureAdmin(admin.ModelAdmin):
-    list_display = ('title', 'get_subplans')
-    search_fields = ('title', 'subplan__title')
-    list_filter = ('subplan',)
+    list_display = ('title', 'display_subplans')
 
-    def get_subplans(self, obj):
-        """Display related subplans in a single line."""
+    def display_subplans(self, obj):
         return " | ".join([sub.title for sub in obj.subplan.all()])
-    get_subplans.short_description = 'Sub Plans'
+    display_subplans.short_description = "Sub Plans"
 
 
-@admin.register(PlanDiscount)
+@admin.register(models.PlanDiscount)
 class PlanDiscountAdmin(admin.ModelAdmin):
     list_display = ('subplan', 'total_months', 'total_discount')
-    list_filter = ('subplan',)
-    search_fields = ('subplan__title',)
-
-
-@admin.register(DynamicFeature)
-class DynamicFeatureAdmin(admin.ModelAdmin):
-    list_display = ('title',)
-    filter_horizontal = ('subplan',)
